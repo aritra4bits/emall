@@ -1,0 +1,64 @@
+name: emall
+description: A new Flutter module.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons:
+  fluttertoast:
+  flutter_screenutil:
+  modal_progress_hud_nsn:
+  flutter_offline:
+  carousel_slider:
+  auto_size_text_pk:
+  flutter_rating_bar:
+  rxdart:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - assets/images/icons/
+    - assets/images/placeholders/
+
+  fonts:
+    - family: DinRegular
+      fonts:
+        - asset: assets/fonts/D-DIN.otf
+    - family: DinBold
+      fonts:
+        - asset: assets/fonts/D-DIN-Bold.otf
+    - family: DinCondensed
+      fonts:
+        - asset: assets/fonts/D-DINCondensed.otf
+    - family: DinCondensedBold
+      fonts:
+        - asset: assets/fonts/D-DINCondensed-Bold.otf
+    - family: DinExp
+      fonts:
+        - asset: assets/fonts/D-DINExp.otf
+    - family: DinExpBold
+      fonts:
+        - asset: assets/fonts/D-DINExp-Bold.otf
+    - family: DinExpItalic
+      fonts:
+        - asset: assets/fonts/D-DINExp-Italic.otf
+    - family: DinItalic
+      fonts:
+        - asset: assets/fonts/D-DIN-Italic.otf
+
+  module:
+    androidX: true
+    androidPackage: com.example.emall
+    iosBundleIdentifier: com.example.emall
