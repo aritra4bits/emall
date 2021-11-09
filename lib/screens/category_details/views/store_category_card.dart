@@ -1,4 +1,4 @@
-import 'package:emall/screens/nav_view/stores/category_details_page.dart';
+import 'package:emall/screens/category_details/category_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

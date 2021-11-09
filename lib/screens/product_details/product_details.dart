@@ -75,11 +75,21 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
                 SizedBox(height: 10.h,),
                 productPriceDetailsCard(),
                 SizedBox(height: 10.h,),
-                productDetailsCard(title: 'Product Details > ',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'),
+                InkWell(
+                  onTap: (){
+                    openBottomSheet(context, detailsBottomSheet(context));
+                  },
+                  child: productDetailsCard(title: 'Product Details > ',
+                  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'),
+                ),
                 SizedBox(height: 10.h,),
-                productDetailsCard(title: 'Specifications > ',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'),
+                InkWell(
+                  onTap: (){
+                    openBottomSheet(context, specsBottomSheet(context));
+                  },
+                  child: productDetailsCard(title: 'Specifications > ',
+                  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'),
+                ),
                 SizedBox(height: 10.h,),
                 productDeliveryCard(title: 'Delivery', description: 'Next Day Delivery, KL & Selangor', deliveryAmount: 'RM15'),
                 SizedBox(height: 10.h,),
@@ -381,6 +391,131 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
           ),
         ),
       ],
+    );
+  }
+
+  openBottomSheet(BuildContext context, Widget child) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.white,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25.0),
+            topRight: Radius.circular(25.0),
+          ),
+        ),
+        builder: (context) {
+          return child;
+        });
+  }
+
+  Widget detailsBottomSheet(BuildContext context){
+    Size size = MediaQuery.of(context).size;
+    return SizedBox(
+      height: size.height * 0.8,
+      child: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+"""PRODUCT DETAILS
+
+Product Title: Sony PlayStation 4 Mega Pack 2
+
+What's in the box: PlayStation 4 (Jet Black) with 1TB HDD x 1 (CUH-2218BB01)
+
+DUALSHOCK 4 wireless controller (Jet Black) x 1
+
+PS4 title “God of War™” (Traditional Chinese / English Ver.) Disc version x 1
+
+PS4 title “Horizon Zero Dawn™: Complete Edition” (Traditional Chinese / English Ver.) Disc version x 1
+
+PS4 title "Grand Theft Auto V Premium Edition" (English / Chinese Ver.) Disc version x 1
+
+PS4 title "FORTNITE NEO VERSA BUNDLE" (English / Chinese Ver.) Digital version x 1
+
+PlayStation Plus 3-month subscription x 1""",
+                    style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
+                  )
+                ],
+              ),
+            ),
+            Positioned(
+              right: 0,
+              top: 0,
+              child: IconButton(
+                icon: Icon(Icons.close, color: const Color(0xFF3B3A3A), size: 26.sp,),
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget specsBottomSheet(BuildContext context){
+    Size size = MediaQuery.of(context).size;
+    return SizedBox(
+      height: size.height * 0.8,
+      child: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+"""SPECIFICATIONS
+
+Sony PlayStation 4 Mega Pack 2
+
+Brand: Sony
+
+SKU: 664162577_MY-1423020668
+
+Warranty Period: 1 Year
+
+Console Type: Playstation
+
+Warranty Type: Local Manufacturer Warranty
+
+Internal Memory: 1TB
+
+Console Model: PS4
+
+What’s in the box:
+PlayStation 4 (Jet Black) with 1TB HDD,
+DUALSHOCK 4 wireless controller (Jet Black) x 1,
+PS4 title “God of War™” Disc version""",
+                    style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
+                  )
+                ],
+              ),
+            ),
+            Positioned(
+              right: 0,
+              top: 0,
+              child: IconButton(
+                icon: Icon(Icons.close, color: const Color(0xFF3B3A3A), size: 26.sp,),
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

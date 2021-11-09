@@ -1,12 +1,15 @@
 import 'package:emall/constants/colors.dart';
 import 'package:emall/managers/nav_bar_manager.dart';
 import 'package:emall/screens/misc/network_error_view.dart';
-import 'package:emall/screens/nav_view/stores/store_page.dart';
+import 'package:emall/screens/nav_view/purchase/purchase_view.dart';
+import 'package:emall/screens/nav_view/search/search_view.dart';
+import 'package:emall/screens/nav_view/stores/store_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'dashboard/dashboard_screen.dart';
+import 'cart/my_cart_view.dart';
+import 'dashboard/dashboard_view.dart';
 
 class NavBarView extends StatefulWidget {
   const NavBarView({Key? key}) : super(key: key);
@@ -23,12 +26,12 @@ class _NavBarViewState extends State<NavBarView> {
   @override
   void initState() {
     super.initState();
-    _children = [
-      const DashboardView(),
-      Container(),
-      const StoreView(),
-      Container(),
-      Container(),
+    _children = const [
+      DashboardView(),
+      SearchView(),
+      StoreView(),
+      MyCartView(),
+      PurchaseView(),
     ];
   }
 
@@ -67,12 +70,8 @@ class _NavBarViewState extends State<NavBarView> {
           stream: navManager.navIndexStream,
           builder: (context, snapshot) {
             if(snapshot.hasData && snapshot.data != null){
-              WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-                setState(() {
-                  _tabIndex = snapshot.data!;
-                });
-                navManager.reset();
-              });
+              _tabIndex = snapshot.data!;
+              navManager.reset();
             }
             return _children[_tabIndex];
           }

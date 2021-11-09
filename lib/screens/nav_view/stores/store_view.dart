@@ -1,6 +1,6 @@
 import 'package:emall/managers/nav_bar_manager.dart';
 import 'package:emall/screens/nav_view/stores/views/store_banner_card.dart';
-import 'package:emall/screens/nav_view/stores/views/store_category_card.dart';
+import 'package:emall/screens/category_details/views/store_category_card.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

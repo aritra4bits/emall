@@ -19,6 +19,8 @@ dependencies:
   auto_size_text_pk:
   flutter_rating_bar:
   rxdart:
+  timelines:
+  flutter_multi_formatter:
 
 dev_dependencies:
   flutter_test:
@@ -36,6 +38,9 @@ flutter:
     - family: DinRegular
       fonts:
         - asset: assets/fonts/D-DIN.otf
+    - family: DinMedium
+      fonts:
+        - asset: assets/fonts/DIN-Medium.ttf
     - family: DinBold
       fonts:
         - asset: assets/fonts/D-DIN-Bold.otf
