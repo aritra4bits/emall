@@ -1,4 +1,5 @@
 import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/cart_page_manager.dart';
 import 'package:emall/widgets/purple_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,7 +37,9 @@ class _AddressSelectViewState extends State<AddressSelectView> {
         }else{
           return Padding(
             padding: EdgeInsets.only(bottom: 30.h),
-            child: PurpleTextButton(onPressed: (){}, title: '+ Add another address'),
+            child: PurpleTextButton(onPressed: (){
+              cartPageManager.updatePageIndex(2);
+            }, title: '+ Add another address', boldTitle: true,),
           );
         }
       },

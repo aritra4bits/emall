@@ -1,5 +1,6 @@
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
+import 'package:emall/screens/nav_view/stores/views/store_details_view.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,7 +30,7 @@ class CategoryDetailsPage extends StatelessWidget {
           children: [
             Text('STORES', style: TextStyle(fontSize: 16.sp, color: AppColors.textLightBlack, fontFamily: 'DinBold'),),
             SizedBox(height: 10.h,),
-            storeNameSection(title: 'SONY STORE'),
+            storeNameSection(context: context, title: 'SONY STORE'),
             SizedBox(height: 40.h,),
             storeDetails(),
           ],
@@ -38,20 +39,25 @@ class CategoryDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget storeNameSection({required String title}){
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset('assets/images/placeholders/sony.png', height: 60.h, fit: BoxFit.fitHeight,),
-          SizedBox(width: 10.w,),
-          Text(title, style: TextStyle(fontSize: 20.sp, color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
-        ],
+  Widget storeNameSection({required BuildContext context, required String title}){
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const StoreDetailsView(),));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset('assets/images/placeholders/sony.png', height: 60.h, fit: BoxFit.fitHeight,),
+            SizedBox(width: 10.w,),
+            Text(title, style: TextStyle(fontSize: 20.sp, color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
+          ],
+        ),
       ),
     );
   }

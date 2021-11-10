@@ -1,4 +1,5 @@
 import 'package:emall/managers/cart_page_manager.dart';
+import 'package:emall/screens/nav_view/cart/views/add_new_address_view.dart';
 import 'package:emall/screens/nav_view/cart/views/cart_view.dart';
 import 'package:emall/screens/nav_view/cart/views/order_flow_view.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,9 @@ class _MyCartViewState extends State<MyCartView> {
           }
           case 1: {
             return const OrderFlowView();
+          }
+          case 2: {
+            return const AddNewAddressView();
           }
           default: {
             return const CartView();

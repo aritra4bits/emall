@@ -38,7 +38,11 @@ class _OrderFlowViewState extends State<OrderFlowView> {
             if(_selectedFlow > 0){
               orderFlowManager.updatePageIndex(_selectedFlow-1);
             }else{
-              cartPageManager.updatePageIndex(0);
+              if(globalKey.currentContext != null){
+                AppGlobal.cancelCheckoutDialog(globalKey.currentContext!, (){
+                  cartPageManager.updatePageIndex(0);
+                });
+              }
             }
           }, icon: Icons.arrow_back_ios_rounded,),
         ),

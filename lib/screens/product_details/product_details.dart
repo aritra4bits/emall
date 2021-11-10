@@ -1,5 +1,7 @@
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
 import 'package:emall/screens/product_details/product_carousel.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:emall/widgets/product_card.dart';
@@ -37,6 +39,8 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
     ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214],
   ];
 
+  int productQuantity = 1;
+
   @override
   void initState() {
     super.initState();
@@ -57,7 +61,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
         actions: [
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8.h),
-            child: GreyRoundButton(onPressed: (){Navigator.pop(context);}, icon: Icons.shopping_cart,),
+            child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(3); Navigator.pop(context);}, icon: Icons.shopping_cart,),
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8.w),
@@ -386,7 +390,9 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0))),
                 backgroundColor: MaterialStateProperty.all(AppColors.cartButton),
               ),
-              onPressed: (){}, child: Text('Add to Cart', style: TextStyle(color: Colors.white, fontSize: 20.sp),),
+              onPressed: (){
+                openBottomSheet(context, addToCart(context));
+              }, child: Text('Add to Cart', style: TextStyle(color: Colors.white, fontSize: 20.sp),),
             ),
           ),
         ),
@@ -411,19 +417,15 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   }
 
   Widget detailsBottomSheet(BuildContext context){
-    Size size = MediaQuery.of(context).size;
-    return SizedBox(
-      height: size.height * 0.8,
-      child: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
 """PRODUCT DETAILS
 
 Product Title: Sony PlayStation 4 Mega Pack 2
@@ -441,41 +443,35 @@ PS4 title "Grand Theft Auto V Premium Edition" (English / Chinese Ver.) Disc ver
 PS4 title "FORTNITE NEO VERSA BUNDLE" (English / Chinese Ver.) Digital version x 1
 
 PlayStation Plus 3-month subscription x 1""",
-                    style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
-                  )
-                ],
-              ),
-            ),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: IconButton(
-                icon: Icon(Icons.close, color: const Color(0xFF3B3A3A), size: 26.sp,),
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ],
+                style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
+              )
+            ],
+          ),
         ),
-      ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            icon: Icon(Icons.close, color: const Color(0xFF3B3A3A), size: 26.sp,),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget specsBottomSheet(BuildContext context){
-    Size size = MediaQuery.of(context).size;
-    return SizedBox(
-      height: size.height * 0.8,
-      child: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
 """SPECIFICATIONS
 
 Sony PlayStation 4 Mega Pack 2
@@ -498,24 +494,225 @@ What’s in the box:
 PlayStation 4 (Jet Black) with 1TB HDD,
 DUALSHOCK 4 wireless controller (Jet Black) x 1,
 PS4 title “God of War™” Disc version""",
-                    style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
-                  )
-                ],
-              ),
+                style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
+              )
+            ],
+          ),
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            icon: Icon(Icons.close, color: const Color(0xFF3B3A3A), size: 26.sp,),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget addToCart(BuildContext context){
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: ProductItem(
+            imageUrl: 'assets/images/placeholders/ps4.png',
+            title: 'Sony PlayStation 4 Mega Pack 2',
+            price: '1999.50',
+            onCheckout: (){
+              navManager.updateNavIndex(3);
+              Navigator.pop(context);
+            },
+            onContinue: (){
+              navManager.updateNavIndex(0);
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            icon: Icon(Icons.close, color: const Color(0xFF3B3A3A), size: 26.sp,),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+class ProductItem extends StatefulWidget {
+  final String imageUrl;
+  final String title;
+  final String price;
+  final VoidCallback onCheckout;
+  final VoidCallback onContinue;
+  const ProductItem({Key? key, required this.imageUrl, required this.title, required this.price, required this.onCheckout, required this.onContinue}) : super(key: key);
+
+  @override
+  _ProductItemState createState() => _ProductItemState();
+}
+
+class _ProductItemState extends State<ProductItem> {
+
+  int quantity = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: BorderRadius.circular(8),
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+            child: Row(
+              children: [
+                Image.asset(widget.imageUrl, width: 100.w, fit: BoxFit.fitWidth,),
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: Padding(
+                              padding: EdgeInsets.only(left: 10.w, top: 30.h),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(widget.title, style: TextStyle(color: const Color(0xFF373737), fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 17.sp),),
+                                  Text('x$quantity', style: TextStyle(color: const Color(0xFF373737), fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 17.sp),),
+                                ],
+                              ),
+                            )),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10.h,),
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Flexible(child: Padding(
+                              padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 10.h, right: 10.w),
+                              child: Row(
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      AutoSizeText("RM", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                                      AutoSizeText('${widget.price.split('.').first}.', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                                      AutoSizeText(widget.price.split('.').last, maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )),
+                            Padding(
+                              padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 5.h),
+                              child: QuantityButton(value: quantity, onChange: (newQuantity) {
+                                setState(() {
+                                  quantity = newQuantity;
+                                });
+                              },),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: IconButton(
-                icon: Icon(Icons.close, color: const Color(0xFF3B3A3A), size: 26.sp,),
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-              ),
+          ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                Text('Please Select Option', style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinBold', fontSize: 16.sp),),
+                Row(
+                  children: [
+                    optionButton(title: 'Option 1', onPressed: (){}),
+                    optionButton(title: 'Option 2', onPressed: (){}),
+                    optionButton(title: 'Option 3', onPressed: (){}),
+                  ],
+                ),
+
+                SizedBox(height: 50.h,),
+              ],
             ),
-          ],
+          ),
+
+
+          checkoutButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget optionButton({required String title, required VoidCallback onPressed}){
+    return Padding(
+      padding: EdgeInsets.only(right: 10.w),
+      child: TextButton(
+        onPressed: onPressed,
+        child: Text(title, style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontSize: 12.sp),),
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all(const RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+          backgroundColor: MaterialStateProperty.all(Colors.grey[300]),
+          visualDensity: VisualDensity.compact,
         ),
       ),
+    );
+  }
+
+  Widget checkoutButton(){
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: 54.h,
+            child: TextButton(
+              child: Text('Continue Shopping', style: TextStyle(fontSize: 17.sp, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, color: Colors.white),),
+              onPressed: (){
+                Navigator.pop(context);
+                widget.onContinue();
+              },
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(AppColors.purplePrimary),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: SizedBox(
+            height: 54.h,
+            child: TextButton(
+              child: Text('Checkout', style: TextStyle(fontSize: 17.sp, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, color: Colors.white),),
+              onPressed: (){
+                Navigator.pop(context);
+                widget.onCheckout();
+              },
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(AppColors.purpleSecondary),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:emall/managers/cart_page_manager.dart';
 import 'package:emall/managers/nav_bar_manager.dart';
 import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
 import 'package:emall/widgets/grey_button.dart';
+import 'package:emall/widgets/keyboard_dismiss_wrapper.dart';
+import 'package:emall/widgets/text_field_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,47 +24,49 @@ class _CartViewState extends State<CartView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
+    return KeyboardDismissWrapper(
+      child: Scaffold(
         backgroundColor: Colors.grey[100],
-        elevation: 0,
-        leading: Padding(
-          padding: EdgeInsets.all(8.sp),
-          child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
-        ),
-        titleSpacing: 0,
-        title: Row(
-          children: [
-            const AutoSizeText('MY CART', style: TextStyle(color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
-            Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.cartButton
+        appBar: AppBar(
+          backgroundColor: Colors.grey[100],
+          elevation: 0,
+          leading: Padding(
+            padding: EdgeInsets.all(8.sp),
+            child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
+          ),
+          titleSpacing: 0,
+          title: Row(
+            children: [
+              const AutoSizeText('MY CART', style: TextStyle(color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.cartButton
+                ),
+                margin: EdgeInsets.only(left: 10.w),
+                padding: EdgeInsets.all(8.sp),
+                alignment: Alignment.center,
+                child: Text('3', style: TextStyle(color: Colors.white, fontFamily: 'DinBold', fontSize: 15.sp),),
               ),
-              margin: EdgeInsets.only(left: 10.w),
-              padding: EdgeInsets.all(8.sp),
-              alignment: Alignment.center,
-              child: Text('3', style: TextStyle(color: Colors.white, fontFamily: 'DinBold', fontSize: 15.sp),),
+            ],
+          ),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    cartList(),
+                    couponTextField(),
+                  ],
+                ),
+              ),
             ),
+            checkoutBar(),
           ],
         ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  cartList(),
-                  couponTextField(),
-                ],
-              ),
-            ),
-          ),
-          checkoutBar(),
-        ],
       ),
     );
   }
@@ -169,37 +173,13 @@ class _CartViewState extends State<CartView> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text('Do you have a coupon code?', style: TextStyle(color: const Color(0xFF373737), fontFamily: 'DinBold', fontWeight: FontWeight.bold, fontSize: 16.sp),),
-          Container(
-            margin: EdgeInsets.only(top: 15.h),
-            padding: EdgeInsets.only(left: 15.w, right: 1.w, top: 0, bottom: 0),
-            height: 37.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            alignment: Alignment.center,
-            child: TextField(
-              controller: searchController,
-              focusNode: focusNode,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (value){
-                if(value != '') {
-
-                }
-              },
-              onChanged: (value) {
-
-              },
-              decoration: InputDecoration(
-                isDense: true,
-                border: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                hintText: 'Enter coupon code',
-                hintStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: const Color(0xFFCACACA)),
-              ),
-            ),
-          )
+          SizedBox(height: 5.h,),
+          TextFieldWidget(
+            controller: searchController,
+            focusNode: focusNode,
+            hintText: 'Enter coupon code',
+            textInputAction: TextInputAction.search,
+          ),
         ],
       ),
     );

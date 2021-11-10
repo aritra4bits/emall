@@ -17,27 +17,29 @@ class OrderSuccessView extends StatelessWidget {
         color: Colors.white,
       ),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset('assets/images/icons/order_success.png', height: 50.h, fit: BoxFit.fitHeight,),
-          SizedBox(height: 10.h,),
-          Text('Thank you for your purchase.\nPayment has been made successfully.', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 16.sp),),
-          SizedBox(height: 30.h,),
-          Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: (){
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK', style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'DinBold'),),
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.purplePrimary)),
+      child: Material(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/images/icons/order_success.png', height: 50.h, fit: BoxFit.fitHeight,),
+            SizedBox(height: 10.h,),
+            Text('Thank you for your purchase.\nPayment has been made successfully.', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 16.sp),),
+            SizedBox(height: 30.h,),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: (){
+                      Navigator.pop(context);
+                    },
+                    child: Text('OK', style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'DinBold'),),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(AppColors.purplePrimary)),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
