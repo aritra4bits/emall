@@ -11,7 +11,7 @@ class CancelCheckoutConfirmationView extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       width: size.width * 0.8,
-      height: size.height * 0.30,
+      height: size.height * 0.28,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.sp),
@@ -19,6 +19,7 @@ class CancelCheckoutConfirmationView extends StatelessWidget {
       ),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Material(
+        color: Colors.white,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
