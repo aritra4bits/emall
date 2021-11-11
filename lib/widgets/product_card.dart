@@ -11,7 +11,8 @@ class ProductCard extends StatelessWidget {
   final String discountPrice;
   final String actualPrice;
   final double rating;
-  final int reviewsCount;
+  final int? reviewsCount;
+  final double? discount;
   const ProductCard(
       {Key? key,
       required this.productImageUrl,
@@ -19,7 +20,7 @@ class ProductCard extends StatelessWidget {
       required this.discountPrice,
       required this.actualPrice,
       required this.rating,
-      required this.reviewsCount})
+      this.reviewsCount, this.discount})
       : super(key: key);
 
   @override
@@ -30,62 +31,75 @@ class ProductCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
           color: Colors.white,
         ),
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            SizedBox(height: 5.h,),
-            Expanded(flex: 4, child: Image.asset('assets/images/placeholders/$productImageUrl', fit: BoxFit.fitHeight,)),
-            const Spacer(flex: 1,),
-            Row(
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Flexible(child: Text(productTitle, maxLines: 2, style: TextStyle(fontSize: 13.sp),)),
-              ],
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
+                SizedBox(height: 5.h,),
+                Expanded(flex: 4, child: Image.asset('assets/images/placeholders/$productImageUrl', fit: BoxFit.fitHeight,)),
+                const Spacer(flex: 1,),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AutoSizeText("RM", maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
-                    AutoSizeText(discountPrice.split('.').first + '.', maxLines: 1, maxFontSize: 20.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 20.sp, color: AppColors.productPrice),),
-                    AutoSizeText(discountPrice.split('.').last, maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
+                    Flexible(child: Text(productTitle, maxLines: 2, style: TextStyle(fontSize: 13.sp),)),
                   ],
                 ),
-                SizedBox(width: 5.w,),
-                Flexible(
-                  child: AutoSizeText(
-                    actualPrice,
-                    maxLines: 1, maxFontSize: 12.sp, minFontSize: 10.sp, stepGranularity: 1.sp,
-                    style: TextStyle(decoration: TextDecoration.lineThrough, fontSize: 12.sp),
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AutoSizeText("RM", maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
+                        AutoSizeText(discountPrice.split('.').first + '.', maxLines: 1, maxFontSize: 20.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 20.sp, color: AppColors.productPrice),),
+                        AutoSizeText(discountPrice.split('.').last, maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
+                      ],
+                    ),
+                    SizedBox(width: 5.w,),
+                    Flexible(
+                      child: AutoSizeText(
+                        actualPrice,
+                        maxLines: 1, maxFontSize: 12.sp, minFontSize: 10.sp, stepGranularity: 1.sp,
+                        style: TextStyle(decoration: TextDecoration.lineThrough, fontSize: 12.sp),
+                      ),
+                    ),
+                  ],
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    RatingBarIndicator(
+                      rating: rating,
+                      direction: Axis.horizontal,
+                      itemCount: 5,
+                      itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
+                      itemSize: 12,
+                      itemBuilder: (context, index) {
+                        if(index+1 > rating) {
+                          return const Icon(Icons.star_border, color: Colors.amber,);
+                        } else {
+                          return const Icon(Icons.star, color: Colors.amber);
+                        }
+                      },
+                    ),
+                    reviewsCount != null ? Text("($reviewsCount)") : const SizedBox(),
+                  ],
+                )
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                RatingBarIndicator(
-                  rating: rating,
-                  direction: Axis.horizontal,
-                  itemCount: 5,
-                  itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
-                  itemSize: 12,
-                  itemBuilder: (context, index) {
-                    if(index+1 > rating) {
-                      return const Icon(Icons.star_border, color: Colors.amber,);
-                    } else {
-                      return const Icon(Icons.star, color: Colors.amber);
-                    }
-                  },
-                ),
-                Text("($reviewsCount)"),
-              ],
-            )
+            discount != null ? Positioned(
+              right: -15.w,
+              child: Container(
+                color: AppColors.productPrice,
+                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+                child: Text('${discount?.round()}%', style: TextStyle(color: Colors.white, fontSize: 12.sp),),
+              ),
+            ) : const SizedBox(),
           ],
         ),
       ),

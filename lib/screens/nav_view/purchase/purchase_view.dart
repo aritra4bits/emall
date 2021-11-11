@@ -30,8 +30,9 @@ class _PurchaseViewState extends State<PurchaseView> {
           padding: EdgeInsets.all(8.sp),
           child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
         ),
+        iconTheme: const IconThemeData(color: AppColors.textLightBlack),
         titleSpacing: 0,
-        title: const AutoSizeText('MY PURCHASE', style: TextStyle(color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
+        title: AutoSizeText('MY PURCHASE', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -49,7 +50,7 @@ class _PurchaseViewState extends State<PurchaseView> {
   Widget cardView({required Widget child}){
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         color: Colors.white,
       ),
       padding: EdgeInsets.only(left: 15.w, top: 9.h, bottom: 14.h),

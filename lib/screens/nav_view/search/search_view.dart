@@ -65,7 +65,7 @@ class _SearchViewState extends State<SearchView> {
       height: 35.h,
       decoration: BoxDecoration(
         color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(6.sp),
       ),
       child: Row(
         children: [
@@ -106,7 +106,7 @@ class _SearchViewState extends State<SearchView> {
       itemBuilder: (context, index) => Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
         ),
         padding: EdgeInsets.all(15.sp),
         margin: EdgeInsets.symmetric(vertical: 5.h),
@@ -122,7 +122,7 @@ class _SearchViewState extends State<SearchView> {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
           color: Colors.white,
         ),
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
@@ -152,7 +152,7 @@ class _SearchViewState extends State<SearchView> {
   Widget productCard({required String imageUrl, required String title}){
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         color: Colors.white,
       ),
       margin: EdgeInsets.only(bottom: 10.h),

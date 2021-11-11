@@ -53,7 +53,7 @@ class _StoreViewState extends State<StoreView> {
       height: 40.h,
       decoration: BoxDecoration(
         color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(6.sp),
       ),
       child: Row(
         children: [

@@ -11,7 +11,7 @@ class GreyRoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: Icon(icon, size: 24.sp, color: AppColors.greyIcon,),
+      child: Icon(icon, size: 24.sp, color: AppColors.textBlack,),
       onPressed: onPressed,
       style: ButtonStyle(
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,

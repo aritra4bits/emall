@@ -59,7 +59,7 @@ class _AppBarViewState extends State<AppBarView> {
       height: 40.h,
       decoration: BoxDecoration(
         color: Colors.white38,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(6.sp),
       ),
       child: Row(
         children: [

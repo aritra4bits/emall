@@ -183,7 +183,7 @@ class _PaymentViewState extends State<PaymentView> {
   Widget textFieldBackground({required Widget child}){
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(4.sp),
         color: Colors.white,
       ),
       margin: EdgeInsets.symmetric(vertical: 10.h),
@@ -197,7 +197,7 @@ class _PaymentViewState extends State<PaymentView> {
       padding: EdgeInsets.only(bottom: 30.h),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

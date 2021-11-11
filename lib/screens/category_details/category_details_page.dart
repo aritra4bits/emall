@@ -20,8 +20,9 @@ class CategoryDetailsPage extends StatelessWidget {
           padding: EdgeInsets.all(8.sp),
           child: GreyRoundButton(onPressed: (){Navigator.pop(context);}, icon: Icons.arrow_back_ios_rounded,),
         ),
+        iconTheme: const IconThemeData(color: AppColors.textLightBlack),
         titleSpacing: 0,
-        title: AutoSizeText(titleBarText.toUpperCase(), style: const TextStyle(color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
+        title: AutoSizeText(titleBarText.toUpperCase(), style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -46,7 +47,7 @@ class CategoryDetailsPage extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
           color: Colors.white,
         ),
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
@@ -74,7 +75,7 @@ class CategoryDetailsPage extends StatelessWidget {
       itemBuilder: (context, index) => Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
         ),
         padding: EdgeInsets.all(15.sp),
         margin: EdgeInsets.symmetric(vertical: 5.h),

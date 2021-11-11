@@ -1,8 +1,12 @@
 import 'package:emall/constants/colors.dart';
+import 'package:emall/screens/nav_view/stores/views/promotions_tab_view.dart';
 import 'package:emall/screens/nav_view/stores/views/shop_tab_view.dart';
+import 'package:emall/screens/nav_view/stores/views/store_profile.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'all_products_tab_view.dart';
 
 class StoreDetailsView extends StatefulWidget {
   const StoreDetailsView({Key? key}) : super(key: key);
@@ -39,7 +43,7 @@ class _StoreDetailsViewState extends State<StoreDetailsView> with SingleTickerPr
         titleSpacing: 0,
         title: searchBar(context),
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +65,7 @@ class _StoreDetailsViewState extends State<StoreDetailsView> with SingleTickerPr
       height: 35.h,
       decoration: BoxDecoration(
         color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(6.sp),
       ),
       child: Row(
         children: [
@@ -105,7 +109,9 @@ class _StoreDetailsViewState extends State<StoreDetailsView> with SingleTickerPr
         Padding(
           padding: EdgeInsets.only(top: 10.h),
           child: TextButton(
-            onPressed: (){}, child: Text('Profile', style: TextStyle(color: AppColors.textBlack, fontSize: 13.sp, fontFamily: 'DinRegular'),),
+            onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const StoreProfileView(),));
+            }, child: Text('Profile', style: TextStyle(color: AppColors.textBlack, fontSize: 13.sp, fontFamily: 'DinRegular'),),
             style: const ButtonStyle(visualDensity: VisualDensity.compact),
           ),
         ),
@@ -114,41 +120,45 @@ class _StoreDetailsViewState extends State<StoreDetailsView> with SingleTickerPr
   }
 
   Widget tabBarView(){
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TabBar(
-          controller: tabController,
-          onTap: (index){
-            setState(() {
-              tabIndex = index;
-            });
-          },
-          labelStyle: TextStyle(fontSize: 13.sp, fontFamily: 'DinRegular'),
-          labelColor: AppColors.textBlack,
-          indicatorSize: TabBarIndicatorSize.label,
-          indicatorColor: AppColors.textBlack,
-          tabs: const [
-            Tab(
-              text: '  Shop  ',
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TabBar(
+            controller: tabController,
+            onTap: (index){
+              setState(() {
+                tabIndex = index;
+              });
+            },
+            labelStyle: TextStyle(fontSize: 13.sp, fontFamily: 'DinRegular'),
+            labelColor: AppColors.textBlack,
+            indicatorSize: TabBarIndicatorSize.label,
+            indicatorColor: AppColors.textBlack,
+            tabs: const [
+              Tab(
+                text: '  Shop  ',
+              ),
+              Tab(
+                text: '  All Products  ',
+              ),
+              Tab(
+                text: '  Promotions  ',
+              ),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: const [
+                ShopTabView(),
+                AllProductsTabView(),
+                PromotionsTabView(),
+              ],
             ),
-            Tab(
-              text: '  All Products  ',
-            ),
-            Tab(
-              text: '  Promotions  ',
-            ),
-          ],
-        ),
-        IndexedStack(
-          children: [
-            ShopTabView(),
-            Text('all'),
-            Text('promotions')
-          ],
-          index: tabIndex,
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

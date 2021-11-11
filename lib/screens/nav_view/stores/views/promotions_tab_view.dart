@@ -1,32 +1,43 @@
-import 'package:emall/screens/nav_view/stores/views/store_top_banner_view.dart';
+import 'package:emall/screens/nav_view/stores/widgets/filter_widget.dart';
 import 'package:emall/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ShopTabView extends StatefulWidget {
-  const ShopTabView({Key? key}) : super(key: key);
+class PromotionsTabView extends StatefulWidget {
+  const PromotionsTabView({Key? key}) : super(key: key);
 
   @override
-  State<ShopTabView> createState() => _ShopTabViewState();
+  State<PromotionsTabView> createState() => _PromotionsTabViewState();
 }
 
-class _ShopTabViewState extends State<ShopTabView> {
+class _PromotionsTabViewState extends State<PromotionsTabView> {
+
+  String value = 'Popularity';
 
   List onSaleProductItems = [
-    ["ps4.png", "Sony PlayStation 4 Mega Pack 2", "1099.90", "", 5.0, 24],
-    ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214],
-    ["laptop.png", 'MacBook 13"2018', "3999.90", "", 5.0, 24],
-    ["hdtv.png", 'Samsung 32"TV', "599.80", "", 4.0, 214],
+    ["ps4.png", "Sony PlayStation 4 Mega Pack 2", "1099.90", "", 5.0, 24, 20.0],
+    ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214, 30.0],
+    ["laptop.png", 'MacBook 13"2018', "3999.90", "", 5.0, 24, 25.0],
+    ["hdtv.png", 'Samsung 32"TV', "599.80", "", 4.0, 214, 15.0],
   ];
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20.h,),
-          const StoreTopBannerView(),
+          SizedBox(height: 10.h,),
+          StoreFilterWidget(
+            value: value,
+            onChanged: (val){
+              if(val != null){
+                setState(() {
+                  value = val;
+                });
+              }
+            },
+          ),
           GridView.builder(
               padding: EdgeInsets.symmetric(vertical: 20.h),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -45,12 +56,10 @@ class _ShopTabViewState extends State<ShopTabView> {
                   actualPrice: onSaleProductItems[index][3],
                   rating: onSaleProductItems[index][4],
                   // reviewsCount: onSaleProductItems[index][5],
+                  discount: onSaleProductItems[index][6],
                 );
               }),
 
-          Image.asset('assets/images/placeholders/company_banner.png', width: size.width, fit: BoxFit.fitWidth,),
-          SizedBox(height: 20.h,),
-          Image.asset('assets/images/placeholders/company_footer.png', width: size.width, fit: BoxFit.fitWidth,),
           SizedBox(height: 20.h,),
         ],
       ),

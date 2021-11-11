@@ -3,6 +3,7 @@ import 'package:emall/constants/colors.dart';
 import 'package:emall/managers/cart_page_manager.dart';
 import 'package:emall/managers/nav_bar_manager.dart';
 import 'package:emall/widgets/grey_button.dart';
+import 'package:emall/widgets/keyboard_dismiss_wrapper.dart';
 import 'package:emall/widgets/text_field_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,40 +23,43 @@ class _AddNewAddressViewState extends State<AddNewAddressView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
+    return KeyboardDismissWrapper(
+      child: Scaffold(
         backgroundColor: Colors.grey[100],
-        elevation: 0,
-        leading: Padding(
-          padding: EdgeInsets.all(8.sp),
-          child: GreyRoundButton(onPressed: (){cartPageManager.updatePageIndex(1);}, icon: Icons.arrow_back_ios_rounded,),
+        appBar: AppBar(
+          backgroundColor: Colors.grey[100],
+          elevation: 0,
+          leading: Padding(
+            padding: EdgeInsets.all(8.sp),
+            child: GreyRoundButton(onPressed: (){cartPageManager.updatePageIndex(1);}, icon: Icons.arrow_back_ios_rounded,),
+          ),
+          iconTheme: const IconThemeData(color: AppColors.textLightBlack),
+          titleSpacing: 0,
+          title: AutoSizeText('SHIPPING ADDRESS', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
         ),
-        titleSpacing: 0,
-        title: const AutoSizeText('SHIPPING ADDRESS', style: TextStyle(color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20.h,),
-            textFieldWithTitle(title: 'Email', textCapitalization: TextCapitalization.none, textInputType: TextInputType.emailAddress, textInputAction: TextInputAction.next),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Text('You can create an account after checkout.', style: TextStyle(color: AppColors.textBlack, fontWeight: FontWeight.w300, fontSize: 14.sp),),
-            ),
-            Divider(color: AppColors.textBlack, height: 70.h, thickness: 1.sp, indent: 20.w, endIndent: 20.w,),
-            textFieldWithTitle(title: 'First Name', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
-            textFieldWithTitle(title: 'Last Name', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
-            textFieldWithTitle(title: 'Street Address', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
-            textFieldWithTitle(title: 'City', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
-            textFieldWithTitle(title: 'State', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
-            textFieldWithTitle(title: 'Zip/Postal Code', textCapitalization: TextCapitalization.none, textInputType: TextInputType.number, textInputAction: TextInputAction.next),
-            textFieldWithTitle(title: 'Country', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
-            textFieldWithTitle(title: 'Phone Number', textCapitalization: TextCapitalization.none, textInputType: TextInputType.phone, textInputAction: TextInputAction.done),
-            SizedBox(height: 20.h,),
-            nextButton(),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20.h,),
+              textFieldWithTitle(title: 'Email', textCapitalization: TextCapitalization.none, textInputType: TextInputType.emailAddress, textInputAction: TextInputAction.next),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Text('You can create an account after checkout.', style: TextStyle(color: AppColors.textBlack, fontWeight: FontWeight.w300, fontSize: 14.sp),),
+              ),
+              Divider(color: AppColors.textBlack, height: 70.h, thickness: 1.sp, indent: 20.w, endIndent: 20.w,),
+              textFieldWithTitle(title: 'First Name', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
+              textFieldWithTitle(title: 'Last Name', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
+              textFieldWithTitle(title: 'Street Address', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
+              textFieldWithTitle(title: 'City', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
+              textFieldWithTitle(title: 'State', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
+              textFieldWithTitle(title: 'Zip/Postal Code', textCapitalization: TextCapitalization.none, textInputType: TextInputType.number, textInputAction: TextInputAction.next),
+              textFieldWithTitle(title: 'Country', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
+              textFieldWithTitle(title: 'Phone Number', textCapitalization: TextCapitalization.none, textInputType: TextInputType.phone, textInputAction: TextInputAction.done),
+              SizedBox(height: 20.h,),
+              nextButton(),
+            ],
+          ),
         ),
       ),
     );

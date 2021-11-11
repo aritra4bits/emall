@@ -15,7 +15,7 @@ class StoreCategoryCard extends StatelessWidget {
       },
       child: ClipRRect(
         clipBehavior: Clip.hardEdge,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

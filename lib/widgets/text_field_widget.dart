@@ -21,7 +21,7 @@ class TextFieldWidget extends StatelessWidget {
       height: 37.h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(6.sp),
       ),
       alignment: Alignment.center,
       child: TextField(

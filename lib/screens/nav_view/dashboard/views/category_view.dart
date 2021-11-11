@@ -36,7 +36,7 @@ class CategoryView extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 5.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,

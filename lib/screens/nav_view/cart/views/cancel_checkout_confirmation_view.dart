@@ -14,7 +14,7 @@ class CancelCheckoutConfirmationView extends StatelessWidget {
       height: size.height * 0.30,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         color: Colors.white,
       ),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
@@ -35,7 +35,7 @@ class CancelCheckoutConfirmationView extends StatelessWidget {
                       Navigator.pop(context);
                     },
                     child: Text('Yes', style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'DinBold'),),
-                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey)),
+                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey[400])),
                   ),
                 ),
                 SizedBox(width: 20.w,),

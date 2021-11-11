@@ -1,16 +1,18 @@
-import 'package:emall/screens/nav_view/stores/views/store_top_banner_view.dart';
+import 'package:emall/screens/nav_view/stores/widgets/filter_widget.dart';
 import 'package:emall/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ShopTabView extends StatefulWidget {
-  const ShopTabView({Key? key}) : super(key: key);
+class AllProductsTabView extends StatefulWidget {
+  const AllProductsTabView({Key? key}) : super(key: key);
 
   @override
-  State<ShopTabView> createState() => _ShopTabViewState();
+  State<AllProductsTabView> createState() => _AllProductsTabViewState();
 }
 
-class _ShopTabViewState extends State<ShopTabView> {
+class _AllProductsTabViewState extends State<AllProductsTabView> {
+
+  String value = 'Popularity';
 
   List onSaleProductItems = [
     ["ps4.png", "Sony PlayStation 4 Mega Pack 2", "1099.90", "", 5.0, 24],
@@ -21,12 +23,21 @@ class _ShopTabViewState extends State<ShopTabView> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20.h,),
-          const StoreTopBannerView(),
+          SizedBox(height: 10.h,),
+          StoreFilterWidget(
+            value: value,
+            onChanged: (val){
+              if(val != null){
+                setState(() {
+                  value = val;
+                });
+              }
+            },
+          ),
           GridView.builder(
               padding: EdgeInsets.symmetric(vertical: 20.h),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -48,9 +59,6 @@ class _ShopTabViewState extends State<ShopTabView> {
                 );
               }),
 
-          Image.asset('assets/images/placeholders/company_banner.png', width: size.width, fit: BoxFit.fitWidth,),
-          SizedBox(height: 20.h,),
-          Image.asset('assets/images/placeholders/company_footer.png', width: size.width, fit: BoxFit.fitWidth,),
           SizedBox(height: 20.h,),
         ],
       ),

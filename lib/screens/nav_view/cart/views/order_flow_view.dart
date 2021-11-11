@@ -8,6 +8,7 @@ import 'package:emall/screens/nav_view/cart/views/payment_view.dart';
 import 'package:emall/screens/nav_view/cart/widgets/order_timeline_view.dart';
 import 'package:emall/utils/app_global.dart';
 import 'package:emall/widgets/grey_button.dart';
+import 'package:emall/widgets/keyboard_dismiss_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,75 +28,77 @@ class _OrderFlowViewState extends State<OrderFlowView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
+    return KeyboardDismissWrapper(
+      child: Scaffold(
         backgroundColor: Colors.grey[100],
-        elevation: 0,
-        leading: Padding(
-          padding: EdgeInsets.all(8.sp),
-          child: GreyRoundButton(onPressed: (){
-            if(_selectedFlow > 0){
-              orderFlowManager.updatePageIndex(_selectedFlow-1);
-            }else{
-              if(globalKey.currentContext != null){
-                AppGlobal.cancelCheckoutDialog(globalKey.currentContext!, (){
-                  cartPageManager.updatePageIndex(0);
-                });
+        appBar: AppBar(
+          backgroundColor: Colors.grey[100],
+          elevation: 0,
+          leading: Padding(
+            padding: EdgeInsets.all(8.sp),
+            child: GreyRoundButton(onPressed: (){
+              if(_selectedFlow > 0){
+                orderFlowManager.updatePageIndex(_selectedFlow-1);
+              }else{
+                if(globalKey.currentContext != null){
+                  AppGlobal.cancelCheckoutDialog(globalKey.currentContext!, (){
+                    cartPageManager.updatePageIndex(0);
+                  });
+                }
               }
-            }
-          }, icon: Icons.arrow_back_ios_rounded,),
+            }, icon: Icons.arrow_back_ios_rounded,),
+          ),
         ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const OrderTimelineView(),
-                  StreamBuilder<int?>(
-                    stream: orderFlowManager.pageIndexStream,
-                    builder: (context, snapshot) {
-                      if(snapshot.hasData && snapshot.data != null){
-                        _selectedFlow = snapshot.data!;
-                      }
-                      switch(_selectedFlow) {
-                        case 0: {
-                          return const AddressSelectView();
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const OrderTimelineView(),
+                    StreamBuilder<int?>(
+                      stream: orderFlowManager.pageIndexStream,
+                      builder: (context, snapshot) {
+                        if(snapshot.hasData && snapshot.data != null){
+                          _selectedFlow = snapshot.data!;
                         }
-                        case 1: {
-                          return const PaymentView();
+                        switch(_selectedFlow) {
+                          case 0: {
+                            return const AddressSelectView();
+                          }
+                          case 1: {
+                            return const PaymentView();
+                          }
+                          case 2: {
+                            return const OrderConfirmView();
+                          }
+                          default: {
+                            return const AddressSelectView();
+                          }
                         }
-                        case 2: {
-                          return const OrderConfirmView();
-                        }
-                        default: {
-                          return const AddressSelectView();
-                        }
-                      }
 
-                    }
-                  ),
-                ],
+                      }
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          StreamBuilder<int?>(
-              stream: orderFlowManager.pageIndexStream,
-              builder: (context, snapshot) {
-                if(snapshot.hasData && snapshot.data != null){
-                  _selectedFlow = snapshot.data!;
-                }
-                if(_selectedFlow >= 2){
-                  return confirmOrderBar(_selectedFlow);
-                }else{
-                  return paymentBar(_selectedFlow);
-                }
-            }
-          ),
-        ],
+            StreamBuilder<int?>(
+                stream: orderFlowManager.pageIndexStream,
+                builder: (context, snapshot) {
+                  if(snapshot.hasData && snapshot.data != null){
+                    _selectedFlow = snapshot.data!;
+                  }
+                  if(_selectedFlow >= 2){
+                    return confirmOrderBar(_selectedFlow);
+                  }else{
+                    return paymentBar(_selectedFlow);
+                  }
+              }
+            ),
+          ],
+        ),
       ),
     );
   }

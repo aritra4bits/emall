@@ -34,10 +34,11 @@ class _CartViewState extends State<CartView> {
             padding: EdgeInsets.all(8.sp),
             child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
           ),
+          iconTheme: const IconThemeData(color: AppColors.textLightBlack),
           titleSpacing: 0,
           title: Row(
             children: [
-              const AutoSizeText('MY CART', style: TextStyle(color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
+              AutoSizeText('MY CART', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
               Container(
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
@@ -93,7 +94,7 @@ class _CartViewState extends State<CartView> {
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       child: Material(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         color: Colors.white,
         child: Row(
           children: [
@@ -178,7 +179,7 @@ class _CartViewState extends State<CartView> {
             controller: searchController,
             focusNode: focusNode,
             hintText: 'Enter coupon code',
-            textInputAction: TextInputAction.search,
+            textInputAction: TextInputAction.done,
           ),
         ],
       ),

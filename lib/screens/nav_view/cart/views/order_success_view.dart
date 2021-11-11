@@ -13,7 +13,7 @@ class OrderSuccessView extends StatelessWidget {
       height: size.height * 0.34,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         color: Colors.white,
       ),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),

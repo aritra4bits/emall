@@ -26,7 +26,7 @@ class _OrderConfirmViewState extends State<OrderConfirmView> {
       padding: EdgeInsets.only(bottom: 30.h, left: 15.w, right: 15.w),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +91,7 @@ class _OrderConfirmViewState extends State<OrderConfirmView> {
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       child: Material(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         color: Colors.white,
         child: Row(
           children: [

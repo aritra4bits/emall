@@ -58,7 +58,7 @@ class _AddressSelectViewState extends State<AddressSelectView> {
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8.sp),
             border: Border.all(color: _selectedIndex == index ? AppColors.purplePrimary : Colors.white),
           ),
           padding: EdgeInsets.only(left: 15.w, top: 10.h, bottom: 10.h),

@@ -2,6 +2,7 @@ import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
 import 'package:emall/managers/nav_bar_manager.dart';
 import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
+import 'package:emall/screens/nav_view/stores/views/store_details_view.dart';
 import 'package:emall/screens/product_details/product_carousel.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:emall/widgets/product_card.dart';
@@ -130,7 +131,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   Widget productPriceDetailsCard() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         color: Colors.white
       ),
       margin: EdgeInsets.symmetric(horizontal: 10.w),
@@ -195,7 +196,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   Widget productDetailsCard({required String title, required String description}) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
           color: Colors.white
       ),
       margin: EdgeInsets.symmetric(horizontal: 10.w),
@@ -213,7 +214,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   Widget productDeliveryCard({required String title, required String description, required String deliveryAmount}) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
           color: Colors.white
       ),
       margin: EdgeInsets.symmetric(horizontal: 10.w),
@@ -237,7 +238,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   Widget reviewsCard({required int reviewCount, required VoidCallback onViewAll, required ratings}) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
           color: Colors.white
       ),
       margin: EdgeInsets.symmetric(horizontal: 10.w),
@@ -294,14 +295,19 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   }
 
   Widget storeNameSection({required String title}){
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset('assets/images/placeholders/sony.png', height: 60.h, fit: BoxFit.fitHeight,),
-        SizedBox(width: 10.w,),
-        Text(title, style: TextStyle(fontSize: 20.sp, color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
-      ],
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const StoreDetailsView(),));
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset('assets/images/placeholders/sony.png', height: 60.h, fit: BoxFit.fitHeight,),
+          SizedBox(width: 10.w,),
+          Text(title, style: TextStyle(fontSize: 20.sp, color: AppColors.textLightBlack, fontWeight: FontWeight.w600),),
+        ],
+      ),
     );
   }
 
@@ -374,12 +380,20 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   Widget addToCartButton() {
     return Row(
       children: [
-        Container(
+        Material(
           color: Colors.white,
-          alignment: Alignment.center,
-          height: 60.h,
-          width: 80.w,
-          child: Image.asset('assets/images/icons/stores.png', color: Colors.black, height: 30, fit: BoxFit.fitHeight,),
+          child: Container(
+            alignment: Alignment.center,
+            height: 60.h,
+            width: 80.w,
+            child: IconButton(
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const StoreDetailsView(),));
+              },
+              padding: EdgeInsets.zero,
+              icon: Image.asset('assets/images/icons/stores.png', color: Colors.black, height: 30, fit: BoxFit.fitHeight,),
+            ),
+          ),
         ),
         Expanded(
           child: SizedBox(
@@ -566,7 +580,7 @@ class _ProductItemState extends State<ProductItem> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(8.sp),
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

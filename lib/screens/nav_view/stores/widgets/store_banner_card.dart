@@ -14,7 +14,7 @@ class StoreBannerCard extends StatelessWidget {
       padding: EdgeInsets.only(right: 10.w),
       child: ClipRRect(
         clipBehavior: Clip.hardEdge,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.sp),
         child: SizedBox(
           width: size.width/1.20,
           child: Column(
