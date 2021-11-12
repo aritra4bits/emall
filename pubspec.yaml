@@ -40,7 +40,7 @@ flutter:
         - asset: assets/fonts/D-DIN.otf
     - family: DinMedium
       fonts:
-        - asset: assets/fonts/DIN-Medium.ttf
+        - asset: assets/fonts/DINPro-Medium.otf
     - family: DinBold
       fonts:
         - asset: assets/fonts/D-DIN-Bold.otf
