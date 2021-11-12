@@ -37,9 +37,8 @@ class _OrderTimelineViewState extends State<OrderTimelineView> {
           if(snapshot.hasData && snapshot.data != null){
             _processIndex = snapshot.data!;
           }
-          return Container(
-            margin: EdgeInsets.only(top: 10.h),
-            height: 100.h,
+          return SizedBox(
+            height: 110.h,
             child: Timeline.tileBuilder(
               theme: TimelineThemeData(
                 direction: Axis.horizontal,
