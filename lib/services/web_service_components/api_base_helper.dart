@@ -57,7 +57,7 @@ class ApiBaseHelper {
     return responseJson;
   }
 
-  Future<dynamic> put(String url, dynamic body) async {
+  Future<dynamic> putRequest(String url, dynamic body) async {
     var responseJson;
     try {
       var header = await SetHeaderHttps.setHttpHeader();

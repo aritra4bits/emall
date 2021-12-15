@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/cart_manager/cart_manager.dart';
 import 'package:emall/managers/product_details_manager/product_details_manager.dart';
 import 'package:emall/managers/products_listing_manager/products_listing_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
@@ -14,6 +16,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:loading_indicator/loading_indicator.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class ProductDetails extends StatefulWidget {
   final String productId;
@@ -45,7 +50,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
     ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214],
   ];
 
-  int productQuantity = 1;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -57,24 +62,35 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: StreamBuilder<ApiResponse<ProductModel>?>(
-          stream: productsListingManager.onSaleProductList,
-          builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
-            if (snapshot.hasData) {
-              switch (snapshot.data!.status) {
-                case Status.LOADING:
-                  return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
-                case Status.COMPLETED:
-                  return productDetails(snapshot.data?.data?.items??[]);
-                case Status.NODATAFOUND:
-                  return SizedBox();
-                case Status.ERROR:
-                  return SizedBox();
+    return ModalProgressHUD(
+      inAsyncCall: isLoading,
+      progressIndicator: Container(
+        color: AppColors.purplePrimary.withOpacity(0.3),
+        alignment: Alignment.center,
+        child: const LoadingIndicator(
+          indicatorType: Indicator.ballScale,
+          colors: [AppColors.purplePrimary],
+        ),
+      ),
+      child: Scaffold(
+        body: StreamBuilder<ApiResponse<ProductModel>?>(
+            stream: productDetailsManager.productList,
+            builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
+              if (snapshot.hasData) {
+                switch (snapshot.data!.status) {
+                  case Status.LOADING:
+                    return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+                  case Status.COMPLETED:
+                    return productDetails(snapshot.data?.data?.items??[]);
+                  case Status.NODATAFOUND:
+                    return SizedBox();
+                  case Status.ERROR:
+                    return SizedBox();
+                }
               }
+              return Container();
             }
-            return Container();
-          }
+        ),
       ),
     );
   }
@@ -105,43 +121,49 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
         children: [
 
           SingleChildScrollView(
-            child: Column(
-              children: [
-                productCarouselView(product),
-                SizedBox(height: 10.h,),
-                productPriceDetailsCard(product),
-                SizedBox(height: 10.h,),
-                InkWell(
-                  onTap: (){
-                    openBottomSheet(context, detailsBottomSheet(context));
-                  },
-                  child: productDetailsCard(title: 'Product Details > ',
-                      description: product.customAttributes![product.customAttributes!.indexWhere((element) => element.attributeCode == "short_description")].value),
-                ),
-                SizedBox(height: 10.h,),
-                InkWell(
-                  onTap: (){
-                    openBottomSheet(context, specsBottomSheet(context));
-                  },
-                  child: productDetailsCard(title: 'Specifications > ',
-                      description: product.customAttributes![product.customAttributes!.indexWhere((element) => element.attributeCode == "description")].value),
-                ),
-                SizedBox(height: 10.h,),
-                productDeliveryCard(title: 'Delivery', description: 'Next Day Delivery, KL & Selangor', deliveryAmount: 'RM15'),
-                SizedBox(height: 10.h,),
-                reviewsCard(reviewCount: 1245, ratings: 5.0, onViewAll: (){}),
-                SizedBox(height: 10.h,),
-                storeNameSection(title: 'SONY STORE'),
-                SizedBox(height: 10.h,),
-                storeTabView(context),
-              ],
+            child: Builder(
+              builder: (context) {
+                int shortDescIndex = product.customAttributes!.indexWhere((element) => element.attributeCode == "short_description");
+                int descIndex = product.customAttributes!.indexWhere((element) => element.attributeCode == "description");
+                return Column(
+                  children: [
+                    productCarouselView(product),
+                    SizedBox(height: 10.h,),
+                    productPriceDetailsCard(product),
+                    SizedBox(height: 10.h,),
+                    InkWell(
+                      onTap: (){
+                        openBottomSheet(context, detailsBottomSheet(context, product));
+                      },
+                      child: productDetailsCard(title: 'Product Details > ',
+                          description: shortDescIndex >= 0 ? product.customAttributes![shortDescIndex].value : "No information provided."),
+                    ),
+                    SizedBox(height: 10.h,),
+                    InkWell(
+                      onTap: (){
+                        openBottomSheet(context, specsBottomSheet(context, product));
+                      },
+                      child: productDetailsCard(title: 'Specifications > ',
+                          description: descIndex >= 0 ? product.customAttributes![descIndex].value : "No information provided."),
+                    ),
+                    SizedBox(height: 10.h,),
+                    productDeliveryCard(title: 'Delivery', description: 'Next Day Delivery, KL & Selangor', deliveryAmount: 'RM15'),
+                    SizedBox(height: 10.h,),
+                    reviewsCard(reviewCount: 1245, ratings: 5.0, onViewAll: (){}),
+                    SizedBox(height: 10.h,),
+                    storeNameSection(title: 'SONY STORE'),
+                    SizedBox(height: 10.h,),
+                    storeTabView(context),
+                  ],
+                );
+              }
             ),
           ),
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: addToCartButton(),
+            child: addToCartButton(product),
           ),
         ],
       ),
@@ -231,7 +253,14 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),),
-          Text(description, style: TextStyle(fontSize: 12.sp),)
+          Html(data: description, style: {
+            "li": Style(
+              fontSize: FontSize(Platform.isAndroid ? 13.sp : 12.sp),
+            ),
+            "p": Style(
+              fontSize: FontSize(Platform.isAndroid ? 13.sp : 12.sp),
+            ),
+          })
         ],
       ),
     );
@@ -424,7 +453,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
         });
   }
 
-  Widget addToCartButton() {
+  Widget addToCartButton(Item product) {
     return Row(
       children: [
         Material(
@@ -452,7 +481,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
                 backgroundColor: MaterialStateProperty.all(AppColors.cartButton),
               ),
               onPressed: (){
-                openBottomSheet(context, addToCart(context));
+                openBottomSheet(context, addToCart(context, product));
               }, child: Text('Add to Cart', style: TextStyle(color: Colors.white, fontSize: 20.sp),),
             ),
           ),
@@ -477,7 +506,8 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
         });
   }
 
-  Widget detailsBottomSheet(BuildContext context){
+  Widget detailsBottomSheet(BuildContext context, Item product){
+    int shortDescIndex = product.customAttributes!.indexWhere((element) => element.attributeCode == "short_description");
     return Stack(
       children: [
         SingleChildScrollView(
@@ -486,26 +516,17 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-"""PRODUCT DETAILS
-
-Product Title: Sony PlayStation 4 Mega Pack 2
-
-What's in the box: PlayStation 4 (Jet Black) with 1TB HDD x 1 (CUH-2218BB01)
-
-DUALSHOCK 4 wireless controller (Jet Black) x 1
-
-PS4 title “God of War™” (Traditional Chinese / English Ver.) Disc version x 1
-
-PS4 title “Horizon Zero Dawn™: Complete Edition” (Traditional Chinese / English Ver.) Disc version x 1
-
-PS4 title "Grand Theft Auto V Premium Edition" (English / Chinese Ver.) Disc version x 1
-
-PS4 title "FORTNITE NEO VERSA BUNDLE" (English / Chinese Ver.) Digital version x 1
-
-PlayStation Plus 3-month subscription x 1""",
+              Text("PRODUCT DETAILS",
                 style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
-              )
+              ),
+              shortDescIndex >= 0 ? Html(data: product.customAttributes![shortDescIndex].value, style: {
+                "li": Style(
+                  fontSize: FontSize(Platform.isAndroid ? 13.sp : 12.sp),
+                ),
+                "p": Style(
+                  fontSize: FontSize(Platform.isAndroid ? 13.sp : 12.sp),
+                ),
+              }) : const Text("No information provided."),
             ],
           ),
         ),
@@ -523,7 +544,8 @@ PlayStation Plus 3-month subscription x 1""",
     );
   }
 
-  Widget specsBottomSheet(BuildContext context){
+  Widget specsBottomSheet(BuildContext context, Item product){
+    int descIndex = product.customAttributes!.indexWhere((element) => element.attributeCode == "description");
     return Stack(
       children: [
         SingleChildScrollView(
@@ -532,31 +554,17 @@ PlayStation Plus 3-month subscription x 1""",
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-"""SPECIFICATIONS
-
-Sony PlayStation 4 Mega Pack 2
-
-Brand: Sony
-
-SKU: 664162577_MY-1423020668
-
-Warranty Period: 1 Year
-
-Console Type: Playstation
-
-Warranty Type: Local Manufacturer Warranty
-
-Internal Memory: 1TB
-
-Console Model: PS4
-
-What’s in the box:
-PlayStation 4 (Jet Black) with 1TB HDD,
-DUALSHOCK 4 wireless controller (Jet Black) x 1,
-PS4 title “God of War™” Disc version""",
+              Text("SPECIFICATIONS",
                 style: TextStyle(color: const Color(0xFF3B3A3A), fontSize: 15.sp, fontFamily: 'DinRegular'),
-              )
+              ),
+              descIndex >= 0 ? Html(data: product.customAttributes![descIndex].value, style: {
+                "li": Style(
+                  fontSize: FontSize(Platform.isAndroid ? 13.sp : 12.sp),
+                ),
+                "p": Style(
+                  fontSize: FontSize(Platform.isAndroid ? 13.sp : 12.sp),
+                ),
+              }) : const Text("No information provided."),
             ],
           ),
         ),
@@ -574,19 +582,33 @@ PS4 title “God of War™” Disc version""",
     );
   }
 
-  Widget addToCart(BuildContext context){
+  Widget addToCart(BuildContext context, Item product){
     return Stack(
       children: [
         SingleChildScrollView(
           child: ProductItem(
-            imageUrl: 'assets/images/placeholders/ps4.png',
-            title: 'Sony PlayStation 4 Mega Pack 2',
-            price: '1999.50',
-            onCheckout: (){
+            imageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${product.mediaGalleryEntries?.first.file}",
+            title: product.name??"",
+            price: "${product.price}",
+            onCheckout: (quantity) async {
+              setState(() {
+                isLoading = true;
+              });
+              await cartManager.addToCart(sku: product.sku??"", quantity: quantity);
+              setState(() {
+                isLoading = false;
+              });
               navManager.updateNavIndex(3);
               Navigator.pop(context);
             },
-            onContinue: (){
+            onContinue: (quantity) async {
+              setState(() {
+                isLoading = true;
+              });
+              await cartManager.addToCart(sku: product.sku??"", quantity: quantity);
+              setState(() {
+                isLoading = false;
+              });
               navManager.updateNavIndex(0);
               Navigator.pop(context);
             },
@@ -612,8 +634,8 @@ class ProductItem extends StatefulWidget {
   final String imageUrl;
   final String title;
   final String price;
-  final VoidCallback onCheckout;
-  final VoidCallback onContinue;
+  final Function(int) onCheckout;
+  final Function(int) onContinue;
   const ProductItem({Key? key, required this.imageUrl, required this.title, required this.price, required this.onCheckout, required this.onContinue}) : super(key: key);
 
   @override
@@ -637,7 +659,7 @@ class _ProductItemState extends State<ProductItem> {
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
             child: Row(
               children: [
-                Image.asset(widget.imageUrl, width: 100.w, fit: BoxFit.fitWidth,),
+                Image.network(widget.imageUrl, width: 100.w, fit: BoxFit.fitWidth, errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.error_outline, color: Colors.red,)),),
                 Flexible(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -671,8 +693,8 @@ class _ProductItemState extends State<ProductItem> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       AutoSizeText("RM", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
-                                      AutoSizeText('${widget.price.split('.').first}.', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
-                                      AutoSizeText(widget.price.split('.').last, maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                                      AutoSizeText(widget.price, maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                                      // AutoSizeText(widget.price.split('.').last, maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
                                     ],
                                   ),
                                 ],
@@ -748,7 +770,7 @@ class _ProductItemState extends State<ProductItem> {
               child: Text('Continue Shopping', style: TextStyle(fontSize: 17.sp, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, color: Colors.white),),
               onPressed: (){
                 Navigator.pop(context);
-                widget.onContinue();
+                widget.onContinue(quantity);
               },
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(AppColors.purplePrimary),
@@ -764,7 +786,7 @@ class _ProductItemState extends State<ProductItem> {
               child: Text('Checkout', style: TextStyle(fontSize: 17.sp, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, color: Colors.white),),
               onPressed: (){
                 Navigator.pop(context);
-                widget.onCheckout();
+                widget.onCheckout(quantity);
               },
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(AppColors.purpleSecondary),

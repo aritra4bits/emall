@@ -23,6 +23,8 @@ dependencies:
   flutter_multi_formatter:
   http:
   shared_preferences:
+  flutter_html:
+  loading_indicator:
 
 dev_dependencies:
   flutter_test:

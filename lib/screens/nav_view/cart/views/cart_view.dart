@@ -4,6 +4,7 @@ import 'package:emall/managers/cart_manager/cart_manager.dart';
 import 'package:emall/managers/ui_manager/cart_page_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/models/cart/cart_items_model.dart';
+import 'package:emall/models/cart/cart_total_model.dart';
 import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
 import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
@@ -58,6 +59,7 @@ class _CartViewState extends State<CartView> {
   }
 
   Widget cartView(CartItemsModel? cartItems){
+    List<CartItem> cartListItem = cartItems?.items??[];
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -72,7 +74,7 @@ class _CartViewState extends State<CartView> {
         title: Row(
           children: [
             AutoSizeText('MY CART', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
-            cartItems?.itemsCount != null ? Container(
+            cartItems?.itemsCount != null && cartItems!.itemsCount! > 0 ? Container(
               decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.cartButton
@@ -80,7 +82,7 @@ class _CartViewState extends State<CartView> {
               margin: EdgeInsets.only(left: 10.w),
               padding: EdgeInsets.all(8.sp),
               alignment: Alignment.center,
-              child: Text("${cartItems!.itemsCount}", style: TextStyle(color: Colors.white, fontFamily: 'DinBold', fontSize: 15.sp),),
+              child: Text("${cartItems.itemsCount}", style: TextStyle(color: Colors.white, fontFamily: 'DinBold', fontSize: 15.sp),),
             ) : const SizedBox(),
           ],
         ),
@@ -88,41 +90,39 @@ class _CartViewState extends State<CartView> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: cartListItem.isNotEmpty ? SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  cartList(cartItems?.items??[]),
-                  couponTextField(),
+                  cartList(cartListItem),
+                  cartListItem.isNotEmpty ? couponTextField() : const SizedBox(),
                 ],
               ),
+            ) : Container(
+              alignment: Alignment.center,
+              child: Text('Cart is empty', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontFamily: 'DinBold', fontWeight: FontWeight.bold, fontSize: 16.sp),),
             ),
           ),
-          checkoutBar(),
+          cartListItem.isNotEmpty ? checkoutBar() : const SizedBox(),
         ],
       ),
     );
   }
 
-  List cartItems = [
-    ['assets/images/placeholders/ps4.png', 'Sony PlayStation 4 Mega Pack 2', '1999.50', 1],
-    ['assets/images/placeholders/hdtv.png', 'Sony 40 R350E Full HD TV', '1444.50', 1],
-    ['assets/images/placeholders/headphones.png', 'Sony WH-CH510 Wireless Headphones', '199.50', 1],
-  ];
 
-  Widget cartList(List<Item> cartListItem){
+  Widget cartList(List<CartItem> cartListItem){
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       itemCount: cartListItem.length,
       itemBuilder: (context, index) {
-        return cartItem(index: index, imageUrl: null, title: cartListItem[index].name??'', price: "${cartListItem[index].price??''}", quantity: cartListItem[index].qty??0);
+        return cartItem(index: index, itemId: cartListItem[index].itemId, imageUrl: null, title: cartListItem[index].name??'', price: "${cartListItem[index].price??''}", quantity: cartListItem[index].qty??0);
       }
     );
   }
 
-  Widget cartItem({required int index, String? imageUrl, required String title, required String price, required int quantity}){
+  Widget cartItem({required int index, required int? itemId, String? imageUrl, required String title, required String price, required int quantity}){
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       child: Material(
@@ -154,7 +154,9 @@ class _CartViewState extends State<CartView> {
                         )),
                         Padding(
                           padding: EdgeInsets.only(left: 10.w, top: 5.h),
-                          child: IconButton(onPressed: (){}, visualDensity: VisualDensity.compact, icon: Image.asset('assets/images/icons/delete.png', width: 16.w, fit: BoxFit.fitWidth,)),
+                          child: IconButton(onPressed: (){
+                            cartManager.deleteCartItem(itemId: itemId);
+                          }, visualDensity: VisualDensity.compact, icon: Image.asset('assets/images/icons/delete.png', width: 16.w, fit: BoxFit.fitWidth,)),
                         ),
                       ],
                     ),
@@ -182,9 +184,7 @@ class _CartViewState extends State<CartView> {
                         Padding(
                           padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 5.h),
                           child: QuantityButton(value: quantity, onChange: (newQuantity) {
-                            setState(() {
-                              cartItems[index][3] = newQuantity;
-                            });
+                            cartManager.updateCartItem(itemId: itemId, quantity: newQuantity);
                           },),
                         ),
                       ],
@@ -220,61 +220,78 @@ class _CartViewState extends State<CartView> {
   }
 
   Widget checkoutBar(){
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6, spreadRadius: 0, offset: Offset(0,-2))]
-      ),
-      height: 54.h,
-      child: Padding(
-        padding: EdgeInsets.only(left: 15.w),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 4,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Text('Shipping: ', style: TextStyle(color: AppColors.textBlack, fontSize: 12.sp, fontFamily: 'DinBold'),),
-                      Text('RM 150', style: TextStyle(color: AppColors.productPrice, fontSize: 12.sp, fontFamily: 'DinBold'),),
-                    ],
+    return StreamBuilder<ApiResponse<CartTotalModel>?>(
+        stream: cartManager.cartTotal,
+        builder: (BuildContext context, AsyncSnapshot<ApiResponse<CartTotalModel>?> snapshot) {
+          if (snapshot.hasData) {
+            switch (snapshot.data!.status) {
+              case Status.LOADING:
+                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+              case Status.COMPLETED:
+                double grandTotal = snapshot.data?.data?.totals?.baseGrandTotal??0;
+                double shippingAmount = snapshot.data?.data?.totals?.shippingAmount??0;
+                return Container(
+                  decoration: const BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6, spreadRadius: 0, offset: Offset(0,-2))]
                   ),
-                  Row(
-                    children: [
-                      Text('TOTAl: ', style: TextStyle(color: AppColors.textBlack, fontSize: 17.sp, fontFamily: 'DinBold'),),
-                      Text('RM 3643.5', style: TextStyle(color: AppColors.productPrice, fontSize: 17.sp, fontFamily: 'DinBold'),),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: SizedBox.expand(
-                child: TextButton(
+                  height: 54.h,
+                  padding: EdgeInsets.only(left: 15.w),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text('Checkout', style: TextStyle(fontSize: 17.sp, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, color: Colors.white),),
-                      Icon(Icons.arrow_forward, size: 20.sp, color: Colors.white,),
+                      Expanded(
+                        flex: 4,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Text('Shipping: ', style: TextStyle(color: AppColors.textBlack, fontSize: 12.sp, fontFamily: 'DinBold'),),
+                                Text('RM ${shippingAmount.toStringAsFixed(2)}', style: TextStyle(color: AppColors.productPrice, fontSize: 12.sp, fontFamily: 'DinBold'),),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Text('TOTAL: ', style: TextStyle(color: AppColors.textBlack, fontSize: 17.sp, fontFamily: 'DinBold'),),
+                                Text('RM ${grandTotal.toStringAsFixed(2)}', style: TextStyle(color: AppColors.productPrice, fontSize: 17.sp, fontFamily: 'DinBold'),),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: SizedBox.expand(
+                          child: TextButton(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Checkout', style: TextStyle(fontSize: 17.sp, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, color: Colors.white),),
+                                Icon(Icons.arrow_forward, size: 20.sp, color: Colors.white,),
+                              ],
+                            ),
+                            onPressed: (){
+                              cartPageManager.updatePageIndex(1);
+                            },
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(AppColors.cartButton),
+                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  onPressed: (){
-                    cartPageManager.updatePageIndex(1);
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(AppColors.cartButton),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+                );
+              case Status.NODATAFOUND:
+                return const SizedBox();
+              case Status.ERROR:
+                return const SizedBox();
+            }
+          }
+          return Container();
+        }
     );
   }
 }

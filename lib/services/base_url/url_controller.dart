@@ -38,4 +38,20 @@ class UrlController {
   getCartItemsUrl(String cartId) {
     return kBaseURL + getGuestCartItemsUrlEndpoint + cartId;
   }
+
+  addToCartUrl(String cartId) {
+    return kBaseURL + getGuestCartItemsUrlEndpoint + cartId + "/items";
+  }
+
+  getCartTotalUrl(String cartId) {
+    return kBaseURL + getGuestCartItemsUrlEndpoint + cartId + "/payment-information";
+  }
+
+  updateCartItemUrl(String cartId, int? itemId) {
+    return kBaseURL + getGuestCartItemsUrlEndpoint + cartId + "/items/$itemId";
+  }
+
+  addCouponUrl(String cartId, String coupon) {
+    return kBaseURL + getGuestCartItemsUrlEndpoint + cartId + "/coupons/$coupon";
+  }
 }

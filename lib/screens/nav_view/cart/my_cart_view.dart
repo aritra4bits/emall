@@ -20,6 +20,7 @@ class _MyCartViewState extends State<MyCartView> {
   void initState() {
     super.initState();
     cartManager.getCartItemList();
+    cartManager.getCartTotal();
   }
 
   @override

@@ -34,7 +34,7 @@ class CartItemsModel {
   final DateTime? updatedAt;
   final bool? isActive;
   final bool? isVirtual;
-  final List<Item>? items;
+  final List<CartItem>? items;
   final int? itemsCount;
   final int? itemsQty;
   final Customer? customer;
@@ -53,7 +53,7 @@ class CartItemsModel {
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
     isActive: json["is_active"] == null ? null : json["is_active"],
     isVirtual: json["is_virtual"] == null ? null : json["is_virtual"],
-    items: json["items"] == null ? null : List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
+    items: json["items"] == null ? null : List<CartItem>.from(json["items"].map((x) => CartItem.fromJson(x))),
     itemsCount: json["items_count"] == null ? null : json["items_count"],
     itemsQty: json["items_qty"] == null ? null : json["items_qty"],
     customer: json["customer"] == null ? null : Customer.fromJson(json["customer"]),
@@ -172,20 +172,20 @@ class Currency {
   final String? baseCurrencyCode;
   final String? storeCurrencyCode;
   final String? quoteCurrencyCode;
-  final int? storeToBaseRate;
-  final int? storeToQuoteRate;
-  final int? baseToGlobalRate;
-  final int? baseToQuoteRate;
+  final double? storeToBaseRate;
+  final double? storeToQuoteRate;
+  final double? baseToGlobalRate;
+  final double? baseToQuoteRate;
 
   factory Currency.fromJson(Map<String, dynamic> json) => Currency(
     globalCurrencyCode: json["global_currency_code"] == null ? null : json["global_currency_code"],
     baseCurrencyCode: json["base_currency_code"] == null ? null : json["base_currency_code"],
     storeCurrencyCode: json["store_currency_code"] == null ? null : json["store_currency_code"],
     quoteCurrencyCode: json["quote_currency_code"] == null ? null : json["quote_currency_code"],
-    storeToBaseRate: json["store_to_base_rate"] == null ? null : json["store_to_base_rate"],
-    storeToQuoteRate: json["store_to_quote_rate"] == null ? null : json["store_to_quote_rate"],
-    baseToGlobalRate: json["base_to_global_rate"] == null ? null : json["base_to_global_rate"],
-    baseToQuoteRate: json["base_to_quote_rate"] == null ? null : json["base_to_quote_rate"],
+    storeToBaseRate: json["store_to_base_rate"] == null ? null : json["store_to_base_rate"].toDouble(),
+    storeToQuoteRate: json["store_to_quote_rate"] == null ? null : json["store_to_quote_rate"].toDouble(),
+    baseToGlobalRate: json["base_to_global_rate"] == null ? null : json["base_to_global_rate"].toDouble(),
+    baseToQuoteRate: json["base_to_quote_rate"] == null ? null : json["base_to_quote_rate"].toDouble(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -247,11 +247,11 @@ class ShippingAssignment {
   });
 
   final Shipping? shipping;
-  final List<Item>? items;
+  final List<CartItem>? items;
 
   factory ShippingAssignment.fromJson(Map<String, dynamic> json) => ShippingAssignment(
     shipping: json["shipping"] == null ? null : Shipping.fromJson(json["shipping"]),
-    items: json["items"] == null ? null : List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
+    items: json["items"] == null ? null : List<CartItem>.from(json["items"].map((x) => CartItem.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -260,8 +260,8 @@ class ShippingAssignment {
   };
 }
 
-class Item {
-  Item({
+class CartItem {
+  CartItem({
     this.itemId,
     this.sku,
     this.qty,
@@ -275,16 +275,16 @@ class Item {
   final String? sku;
   final int? qty;
   final String? name;
-  final int? price;
+  final double? price;
   final String? productType;
   final String? quoteId;
 
-  factory Item.fromJson(Map<String, dynamic> json) => Item(
+  factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
     itemId: json["item_id"] == null ? null : json["item_id"],
     sku: json["sku"] == null ? null : json["sku"],
     qty: json["qty"] == null ? null : json["qty"],
     name: json["name"] == null ? null : json["name"],
-    price: json["price"] == null ? null : json["price"],
+    price: json["price"] == null ? null : json["price"].toDouble(),
     productType: json["product_type"] == null ? null : json["product_type"],
     quoteId: json["quote_id"] == null ? null : json["quote_id"],
   );
