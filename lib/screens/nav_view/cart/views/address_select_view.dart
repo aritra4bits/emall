@@ -1,5 +1,5 @@
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/cart_page_manager.dart';
+import 'package:emall/managers/ui_manager/cart_page_manager.dart';
 import 'package:emall/widgets/purple_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

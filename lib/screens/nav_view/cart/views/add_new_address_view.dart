@@ -1,7 +1,7 @@
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/cart_page_manager.dart';
-import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/managers/ui_manager/cart_page_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:emall/widgets/keyboard_dismiss_wrapper.dart';
 import 'package:emall/widgets/text_field_widget.dart';

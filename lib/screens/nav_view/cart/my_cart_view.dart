@@ -1,4 +1,5 @@
-import 'package:emall/managers/cart_page_manager.dart';
+import 'package:emall/managers/cart_manager/cart_manager.dart';
+import 'package:emall/managers/ui_manager/cart_page_manager.dart';
 import 'package:emall/screens/nav_view/cart/views/add_new_address_view.dart';
 import 'package:emall/screens/nav_view/cart/views/cart_view.dart';
 import 'package:emall/screens/nav_view/cart/views/order_flow_view.dart';
@@ -14,6 +15,12 @@ class MyCartView extends StatefulWidget {
 class _MyCartViewState extends State<MyCartView> {
 
   int _processIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    cartManager.getCartItemList();
+  }
 
   @override
   Widget build(BuildContext context) {

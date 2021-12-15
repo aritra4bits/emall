@@ -1,6 +1,6 @@
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:emall/widgets/purple_text_button.dart';
 import 'package:flutter/cupertino.dart';

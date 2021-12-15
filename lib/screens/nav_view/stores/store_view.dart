@@ -1,6 +1,10 @@
-import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/category_manager/category_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
+import 'package:emall/models/product_categories/product_category_models.dart';
 import 'package:emall/screens/nav_view/stores/widgets/store_banner_card.dart';
 import 'package:emall/screens/category_details/views/store_category_card.dart';
+import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,6 +20,12 @@ class _StoreViewState extends State<StoreView> {
 
   TextEditingController searchController = TextEditingController();
   FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    categoryListManager.getCategoryList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +126,27 @@ class _StoreViewState extends State<StoreView> {
   ];
 
   Widget categoryList() {
+    return StreamBuilder<ApiResponse<CategoryIdListModel>?>(
+        stream: categoryListManager.categoryList,
+        builder: (BuildContext context, AsyncSnapshot<ApiResponse<CategoryIdListModel>?> snapshot) {
+          if (snapshot.hasData) {
+            switch (snapshot.data!.status) {
+              case Status.LOADING:
+                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+              case Status.COMPLETED:
+                return categoryListView(snapshot.data?.data?.childrenData??[]);
+              case Status.NODATAFOUND:
+                return SizedBox();
+              case Status.ERROR:
+                return SizedBox();
+            }
+          }
+          return Container();
+        }
+    );
+  }
+
+  Widget categoryListView(List<CategoryIdListModel> categoryIds) {
     return GridView.builder(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -125,9 +156,9 @@ class _StoreViewState extends State<StoreView> {
             mainAxisSpacing: 8),
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: categoryItems.length,
+        itemCount: categoryIds.length,
         itemBuilder: (BuildContext ctx, index) {
-          return StoreCategoryCard(title: categoryItems[index][0], imageUrl: categoryItems[index][1],);
+          return StoreCategoryCard(categoryId: "${categoryIds[index].id}", title: "${categoryIds[index].name}");
         });
   }
 }

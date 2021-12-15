@@ -21,6 +21,8 @@ dependencies:
   rxdart:
   timelines:
   flutter_multi_formatter:
+  http:
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:

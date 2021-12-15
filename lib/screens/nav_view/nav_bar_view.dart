@@ -1,5 +1,5 @@
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/screens/misc/network_error_view.dart';
 import 'package:emall/screens/nav_view/purchase/purchase_view.dart';
 import 'package:emall/screens/nav_view/search/search_view.dart';
@@ -83,8 +83,8 @@ class _NavBarViewState extends State<NavBarView> {
         selectedItemColor: Colors.white,
         iconSize: 24.sp,
         unselectedItemColor: Colors.white,
-        selectedLabelStyle: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(11), fontFamily: "AppLight"),
-        unselectedLabelStyle: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(11), fontFamily: "AppLight"),
+        selectedLabelStyle: TextStyle(color: Colors.white, fontSize: 11.sp, fontFamily: "AppLight"),
+        unselectedLabelStyle: TextStyle(color: Colors.white, fontSize: 11.sp, fontFamily: "AppLight"),
         onTap: (value) async {
           setState(() {
             _tabIndex = value;

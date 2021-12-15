@@ -6,6 +6,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProductCard extends StatelessWidget {
+  final String productId;
   final String productImageUrl;
   final String productTitle;
   final String discountPrice;
@@ -15,6 +16,7 @@ class ProductCard extends StatelessWidget {
   final double? discount;
   const ProductCard(
       {Key? key,
+      required this.productId,
       required this.productImageUrl,
       required this.productTitle,
       required this.discountPrice,
@@ -27,7 +29,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductDetails(),));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetails(productId: productId,),));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -42,7 +44,7 @@ class ProductCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 5.h,),
-                Expanded(flex: 4, child: Image.asset('assets/images/placeholders/$productImageUrl', fit: BoxFit.fitHeight,)),
+                Expanded(flex: 4, child: Image.network(productImageUrl, fit: BoxFit.fitHeight,)),
                 const Spacer(flex: 1,),
                 Row(
                   children: [

@@ -1,7 +1,11 @@
 
+import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/products_listing_manager/products_listing_manager.dart';
+import 'package:emall/models/product_model/product_model.dart';
 import 'package:emall/screens/nav_view/dashboard/views/app_bar_view.dart';
 import 'package:emall/screens/nav_view/dashboard/views/category_view.dart';
 import 'package:emall/screens/nav_view/dashboard/views/top_banner_view.dart';
+import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/heading_text.dart';
 import 'package:emall/widgets/product_card.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +40,12 @@ class _DashboardViewState extends State<DashboardView> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    productsListingManager.getOnSaleProducts();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -58,7 +68,28 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget onSaleProducts() {
+  Widget onSaleProducts(){
+    return StreamBuilder<ApiResponse<ProductModel>?>(
+        stream: productsListingManager.onSaleProductList,
+        builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
+          if (snapshot.hasData) {
+            switch (snapshot.data!.status) {
+              case Status.LOADING:
+                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+              case Status.COMPLETED:
+                return onSaleProductsView(snapshot.data?.data?.items??[]);
+              case Status.NODATAFOUND:
+                return SizedBox();
+              case Status.ERROR:
+                return SizedBox();
+            }
+          }
+          return Container();
+        }
+    );
+  }
+
+  Widget onSaleProductsView(List<Item> products) {
     return GridView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -68,9 +99,9 @@ class _DashboardViewState extends State<DashboardView> {
             mainAxisSpacing: 8),
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: onSaleProductItems.length,
+        itemCount: products.length,
         itemBuilder: (BuildContext ctx, index) {
-          return ProductCard(productImageUrl: onSaleProductItems[index][0], productTitle: onSaleProductItems[index][1], discountPrice: onSaleProductItems[index][2], actualPrice: onSaleProductItems[index][3], rating: onSaleProductItems[index][4], reviewsCount: onSaleProductItems[index][5]);
+          return ProductCard(productId: "${products[index].id}", productImageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${products[index].mediaGalleryEntries!.first.file!}", productTitle: products[index].name!, discountPrice: products[index].customAttributes![products[index].customAttributes!.indexWhere((element) => element.attributeCode == "special_price")].value, actualPrice: "${products[index].price}", rating: 4.4, reviewsCount: 5);
         });
   }
 
@@ -93,7 +124,7 @@ class _DashboardViewState extends State<DashboardView> {
         shrinkWrap: true,
         itemCount: trendingProductItems.length,
         itemBuilder: (BuildContext ctx, index) {
-          return ProductCard(productImageUrl: trendingProductItems[index][0], productTitle: trendingProductItems[index][1], discountPrice: trendingProductItems[index][2], actualPrice: trendingProductItems[index][3], rating: trendingProductItems[index][4], reviewsCount: trendingProductItems[index][5]);
+          return ProductCard(productId: "", productImageUrl: trendingProductItems[index][0], productTitle: trendingProductItems[index][1], discountPrice: trendingProductItems[index][2], actualPrice: trendingProductItems[index][3], rating: trendingProductItems[index][4], reviewsCount: trendingProductItems[index][5]);
         });
   }
 }

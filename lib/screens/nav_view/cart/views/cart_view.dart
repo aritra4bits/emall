@@ -1,8 +1,11 @@
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/cart_page_manager.dart';
-import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/managers/cart_manager/cart_manager.dart';
+import 'package:emall/managers/ui_manager/cart_page_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
+import 'package:emall/models/cart/cart_items_model.dart';
 import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
+import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:emall/widgets/keyboard_dismiss_wrapper.dart';
 import 'package:emall/widgets/text_field_widget.dart';
@@ -23,51 +26,80 @@ class _CartViewState extends State<CartView> {
   FocusNode focusNode = FocusNode();
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return KeyboardDismissWrapper(
       child: Scaffold(
+        body: StreamBuilder<ApiResponse<CartItemsModel>?>(
+            stream: cartManager.cartItemList,
+            builder: (BuildContext context, AsyncSnapshot<ApiResponse<CartItemsModel>?> snapshot) {
+              if (snapshot.hasData) {
+                switch (snapshot.data!.status) {
+                  case Status.LOADING:
+                    return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+                  case Status.COMPLETED:
+                    return cartView(snapshot.data?.data);
+                  case Status.NODATAFOUND:
+                    return SizedBox();
+                  case Status.ERROR:
+                    return SizedBox();
+                }
+              }
+              return Container();
+            }
+        ),
+      ),
+    );
+  }
+
+  Widget cartView(CartItemsModel? cartItems){
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
         backgroundColor: Colors.grey[100],
-        appBar: AppBar(
-          backgroundColor: Colors.grey[100],
-          elevation: 0,
-          leading: Padding(
-            padding: EdgeInsets.all(8.sp),
-            child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
-          ),
-          iconTheme: const IconThemeData(color: AppColors.textLightBlack),
-          titleSpacing: 0,
-          title: Row(
-            children: [
-              AutoSizeText('MY CART', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
-              Container(
-                decoration: const BoxDecoration(
+        elevation: 0,
+        leading: Padding(
+          padding: EdgeInsets.all(8.sp),
+          child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textLightBlack),
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            AutoSizeText('MY CART', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
+            cartItems?.itemsCount != null ? Container(
+              decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.cartButton
-                ),
-                margin: EdgeInsets.only(left: 10.w),
-                padding: EdgeInsets.all(8.sp),
-                alignment: Alignment.center,
-                child: Text('3', style: TextStyle(color: Colors.white, fontFamily: 'DinBold', fontSize: 15.sp),),
               ),
-            ],
-          ),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    cartList(),
-                    couponTextField(),
-                  ],
-                ),
-              ),
-            ),
-            checkoutBar(),
+              margin: EdgeInsets.only(left: 10.w),
+              padding: EdgeInsets.all(8.sp),
+              alignment: Alignment.center,
+              child: Text("${cartItems!.itemsCount}", style: TextStyle(color: Colors.white, fontFamily: 'DinBold', fontSize: 15.sp),),
+            ) : const SizedBox(),
           ],
         ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  cartList(cartItems?.items??[]),
+                  couponTextField(),
+                ],
+              ),
+            ),
+          ),
+          checkoutBar(),
+        ],
       ),
     );
   }
@@ -78,19 +110,19 @@ class _CartViewState extends State<CartView> {
     ['assets/images/placeholders/headphones.png', 'Sony WH-CH510 Wireless Headphones', '199.50', 1],
   ];
 
-  Widget cartList(){
+  Widget cartList(List<Item> cartListItem){
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 15.w),
-      itemCount: cartItems.length,
+      itemCount: cartListItem.length,
       itemBuilder: (context, index) {
-        return cartItem(index: index, imageUrl: cartItems[index][0], title: cartItems[index][1], price: cartItems[index][2], quantity: cartItems[index][3]);
+        return cartItem(index: index, imageUrl: null, title: cartListItem[index].name??'', price: "${cartListItem[index].price??''}", quantity: cartListItem[index].qty??0);
       }
     );
   }
 
-  Widget cartItem({required int index, required String imageUrl, required String title, required String price, required int quantity}){
+  Widget cartItem({required int index, String? imageUrl, required String title, required String price, required int quantity}){
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       child: Material(
@@ -98,10 +130,10 @@ class _CartViewState extends State<CartView> {
         color: Colors.white,
         child: Row(
           children: [
-            Padding(
+            imageUrl != null ? Padding(
               padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 5.h),
               child: Image.asset(imageUrl, width: 100.w, fit: BoxFit.fitWidth,),
-            ),
+            ) : const SizedBox(),
             Flexible(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -139,8 +171,9 @@ class _CartViewState extends State<CartView> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   AutoSizeText("RM", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
-                                  AutoSizeText('${price.split('.').first}.', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
-                                  AutoSizeText(price.split('.').last, maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                                  AutoSizeText('$price', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                                  // AutoSizeText('${price.split('.').first}.', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                                  // AutoSizeText(price.split('.').last, maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
                                 ],
                               ),
                             ],

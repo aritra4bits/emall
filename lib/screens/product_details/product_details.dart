@@ -1,9 +1,13 @@
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/managers/product_details_manager/product_details_manager.dart';
+import 'package:emall/managers/products_listing_manager/products_listing_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
+import 'package:emall/models/product_model/product_model.dart';
 import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
 import 'package:emall/screens/nav_view/stores/views/store_details_view.dart';
 import 'package:emall/screens/product_details/product_carousel.dart';
+import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:emall/widgets/product_card.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +16,8 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProductDetails extends StatefulWidget {
-  const ProductDetails({Key? key}) : super(key: key);
+  final String productId;
+  const ProductDetails({Key? key, required this.productId}) : super(key: key);
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
@@ -46,10 +51,36 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    productDetailsManager.getProducts(productId: widget.productId);
+    productsListingManager.getOnSaleProducts();
   }
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder<ApiResponse<ProductModel>?>(
+          stream: productsListingManager.onSaleProductList,
+          builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
+            if (snapshot.hasData) {
+              switch (snapshot.data!.status) {
+                case Status.LOADING:
+                  return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+                case Status.COMPLETED:
+                  return productDetails(snapshot.data?.data?.items??[]);
+                case Status.NODATAFOUND:
+                  return SizedBox();
+                case Status.ERROR:
+                  return SizedBox();
+              }
+            }
+            return Container();
+          }
+      ),
+    );
+  }
+
+  Widget productDetails(List<Item> products){
+    Item product = products.first;
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -76,16 +107,16 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
           SingleChildScrollView(
             child: Column(
               children: [
-                productCarouselView(),
+                productCarouselView(product),
                 SizedBox(height: 10.h,),
-                productPriceDetailsCard(),
+                productPriceDetailsCard(product),
                 SizedBox(height: 10.h,),
                 InkWell(
                   onTap: (){
                     openBottomSheet(context, detailsBottomSheet(context));
                   },
                   child: productDetailsCard(title: 'Product Details > ',
-                  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'),
+                      description: product.customAttributes![product.customAttributes!.indexWhere((element) => element.attributeCode == "short_description")].value),
                 ),
                 SizedBox(height: 10.h,),
                 InkWell(
@@ -93,7 +124,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
                     openBottomSheet(context, specsBottomSheet(context));
                   },
                   child: productDetailsCard(title: 'Specifications > ',
-                  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'),
+                      description: product.customAttributes![product.customAttributes!.indexWhere((element) => element.attributeCode == "description")].value),
                 ),
                 SizedBox(height: 10.h,),
                 productDeliveryCard(title: 'Delivery', description: 'Next Day Delivery, KL & Selangor', deliveryAmount: 'RM15'),
@@ -117,18 +148,13 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
     );
   }
 
-  Widget productCarouselView() {
+  Widget productCarouselView(Item product) {
     return ProductCarouselView(
-      slideItems: [
-        Image.asset('assets/images/placeholders/ps4.png', fit: BoxFit.fitHeight,),
-        Image.asset('assets/images/placeholders/ps4.png', fit: BoxFit.fitHeight,),
-        Image.asset('assets/images/placeholders/ps4.png', fit: BoxFit.fitHeight,),
-        Image.asset('assets/images/placeholders/ps4.png', fit: BoxFit.fitHeight,),
-      ],
+      slideItems: product.mediaGalleryEntries!.map((e) => Image.network("https://mage2.fireworksmedia.com/pub/media/catalog/product${e.file}")).toList(),
     );
   }
 
-  Widget productPriceDetailsCard() {
+  Widget productPriceDetailsCard(Item product) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.sp),
@@ -145,8 +171,8 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText("RM", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
-                  AutoSizeText('1990.', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
-                  AutoSizeText("50", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                  AutoSizeText("${product.price}", maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                  // AutoSizeText("50", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
                 ],
               ),
               const Spacer(),
@@ -166,7 +192,7 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
               ),
             ],
           ),
-          Text("Sony PlayStation 4 Mega Pack 2", maxLines: 2, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: AppColors.textBlack),),
+          Text("${product.name}", maxLines: 2, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: AppColors.textBlack),),
           SizedBox(height: 10.h,),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -357,11 +383,32 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
         shrinkWrap: true,
         itemCount: recommendedProductItems.length,
         itemBuilder: (BuildContext ctx, index) {
-          return ProductCard(productImageUrl: recommendedProductItems[index][0], productTitle: recommendedProductItems[index][1], discountPrice: recommendedProductItems[index][2], actualPrice: recommendedProductItems[index][3], rating: recommendedProductItems[index][4], reviewsCount: recommendedProductItems[index][5]);
+          return ProductCard(productId: "", productImageUrl: recommendedProductItems[index][0], productTitle: recommendedProductItems[index][1], discountPrice: recommendedProductItems[index][2], actualPrice: recommendedProductItems[index][3], rating: recommendedProductItems[index][4], reviewsCount: recommendedProductItems[index][5]);
         });
   }
 
-  Widget onSaleProducts() {
+  Widget onSaleProducts(){
+    return StreamBuilder<ApiResponse<ProductModel>?>(
+        stream: productsListingManager.onSaleProductList,
+        builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
+          if (snapshot.hasData) {
+            switch (snapshot.data!.status) {
+              case Status.LOADING:
+                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+              case Status.COMPLETED:
+                return onSaleProductsView(snapshot.data?.data?.items??[]);
+              case Status.NODATAFOUND:
+                return SizedBox();
+              case Status.ERROR:
+                return SizedBox();
+            }
+          }
+          return Container();
+        }
+    );
+  }
+
+  Widget onSaleProductsView(List<Item> products) {
     return GridView.builder(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -371,9 +418,9 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
             mainAxisSpacing: 8),
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: onSaleProductItems.length,
+        itemCount: products.length,
         itemBuilder: (BuildContext ctx, index) {
-          return ProductCard(productImageUrl: onSaleProductItems[index][0], productTitle: onSaleProductItems[index][1], discountPrice: onSaleProductItems[index][2], actualPrice: onSaleProductItems[index][3], rating: onSaleProductItems[index][4], reviewsCount: onSaleProductItems[index][5]);
+          return ProductCard(productId: "${products[index].id}", productImageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${products[index].mediaGalleryEntries!.first.file!}", productTitle: products[index].name!, discountPrice: products[index].customAttributes![products[index].customAttributes!.indexWhere((element) => element.attributeCode == "special_price")].value, actualPrice: "${products[index].price}", rating: 4.4, reviewsCount: 5);
         });
   }
 

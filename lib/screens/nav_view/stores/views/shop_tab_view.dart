@@ -39,6 +39,7 @@ class _ShopTabViewState extends State<ShopTabView> {
               itemCount: onSaleProductItems.length,
               itemBuilder: (BuildContext ctx, index) {
                 return ProductCard(
+                  productId: "",
                   productImageUrl: onSaleProductItems[index][0],
                   productTitle: onSaleProductItems[index][1],
                   discountPrice: onSaleProductItems[index][2],

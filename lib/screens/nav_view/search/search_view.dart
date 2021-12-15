@@ -1,6 +1,10 @@
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/nav_bar_manager.dart';
+import 'package:emall/managers/product_details_manager/product_details_manager.dart';
+import 'package:emall/managers/search_manager/search_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
+import 'package:emall/models/product_model/product_model.dart';
 import 'package:emall/screens/nav_view/stores/views/store_details_view.dart';
+import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -76,7 +80,7 @@ class _SearchViewState extends State<SearchView> {
               textInputAction: TextInputAction.search,
               onSubmitted: (value){
                 if(value != '') {
-
+                  searchManager.searchProduct(searchTerm: value);
                 }
               },
               onChanged: (value) {
@@ -92,7 +96,9 @@ class _SearchViewState extends State<SearchView> {
               ),
             ),
           ),
-          IconButton(onPressed: (){}, icon: Icon(Icons.search, color: const Color(0xFF727272), size: 22.sp,),)
+          IconButton(onPressed: (){
+            searchManager.searchProduct(searchTerm: searchController.text);
+          }, icon: Icon(Icons.search, color: const Color(0xFF727272), size: 22.sp,),)
         ],
       ),
     );
@@ -139,12 +145,38 @@ class _SearchViewState extends State<SearchView> {
   }
 
   Widget productList(){
+    return StreamBuilder<ApiResponse<ProductModel>?>(
+        stream: productDetailsManager.productList,
+        builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
+          if (snapshot.hasData) {
+            switch (snapshot.data!.status) {
+              case Status.LOADING:
+                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+              case Status.COMPLETED:
+                return productListView(snapshot.data?.data?.items??[]);
+              case Status.NODATAFOUND:
+                return SizedBox();
+              case Status.ERROR:
+                return SizedBox();
+            }
+          }
+          return Container();
+        }
+    );
+  }
+
+  Widget productListView(List<Item> items){
+    if(items.isEmpty){
+      return const Center(
+        child: Text("No products available. Try a different search term."),
+      );
+    }
     return ListView.builder(
-      itemCount: productDetailsItems.length,
+      itemCount: items.length,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        return productCard(imageUrl: productDetailsItems[index][0], title: productDetailsItems[index][1]);
+        return productCard(imageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${items[index].mediaGalleryEntries!.first.file!}", title: items[index].name!);
       },
     );
   }
@@ -161,7 +193,7 @@ class _SearchViewState extends State<SearchView> {
         children: [
           Padding(
             padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 5.h),
-            child: Image.asset(imageUrl, width: 100.w, fit: BoxFit.fitWidth,),
+            child: Image.network(imageUrl, width: 100.w, fit: BoxFit.fitWidth,),
           ),
           Flexible(child: Padding(
             padding: EdgeInsets.only(left: 10.w, top: 20.h, bottom: 10.h, right: 10.w),

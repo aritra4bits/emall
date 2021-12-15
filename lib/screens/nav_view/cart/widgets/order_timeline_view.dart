@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:emall/constants/colors.dart';
-import 'package:emall/managers/order_flow_manager.dart';
+import 'package:emall/managers/ui_manager/order_flow_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:timelines/timelines.dart';

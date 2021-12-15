@@ -1,8 +1,8 @@
 import 'package:emall/constants/colors.dart';
 import 'package:emall/main.dart';
-import 'package:emall/managers/cart_page_manager.dart';
-import 'package:emall/managers/nav_bar_manager.dart';
-import 'package:emall/managers/order_flow_manager.dart';
+import 'package:emall/managers/ui_manager/cart_page_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
+import 'package:emall/managers/ui_manager/order_flow_manager.dart';
 import 'package:emall/screens/nav_view/cart/views/address_select_view.dart';
 import 'package:emall/screens/nav_view/cart/views/payment_view.dart';
 import 'package:emall/screens/nav_view/cart/widgets/order_timeline_view.dart';
