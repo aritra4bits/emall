@@ -5,6 +5,7 @@ import 'package:emall/managers/ui_manager/cart_page_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/models/cart/cart_items_model.dart';
 import 'package:emall/models/cart/cart_total_model.dart';
+import 'package:emall/screens/auth/login.dart';
 import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
 import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
@@ -13,6 +14,7 @@ import 'package:emall/widgets/text_field_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 class CartView extends StatefulWidget {
   const CartView({Key? key}) : super(key: key);
@@ -42,12 +44,32 @@ class _CartViewState extends State<CartView> {
               if (snapshot.hasData) {
                 switch (snapshot.data!.status) {
                   case Status.LOADING:
-                    return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+                    return Container(
+                      color: AppColors.purplePrimary.withOpacity(0.3),
+                      alignment: Alignment.center,
+                      child: const LoadingIndicator(
+                        indicatorType: Indicator.ballScale,
+                        colors: [AppColors.purplePrimary],
+                      ),
+                    );
                   case Status.COMPLETED:
                     return cartView(snapshot.data?.data);
                   case Status.NODATAFOUND:
                     return SizedBox();
                   case Status.ERROR:
+                    if(snapshot.data?.message == "Unauthorized"){
+                      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginUserView(targetView: null,),)).then((value) {
+                          if(value == true){
+                            cartManager.getCartItemList();
+                            cartManager.getCartTotal();
+                          }
+                        });
+                      });
+                      return const Center(
+                        child: Text("Please login to view cart"),
+                      );
+                    }
                     return SizedBox();
                 }
               }

@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Preferences {
-  String token = 'token';
+  String bearerToken = 'token';
   // String password = 'password';
   String name = 'name';
   String phone = 'phone';
@@ -17,7 +17,7 @@ class Preferences {
   String userId = 'userId';
   String notifications = 'notifications';
   String locale = 'locale';
-  String cartId = 'cartId';
+  String quoteId = 'quoteId';
 
   final Future<SharedPreferences> _storage = SharedPreferences.getInstance();
 

@@ -1,3 +1,5 @@
+import 'package:emall/config/global.dart';
+import 'package:emall/config/preferences.dart';
 import 'package:emall/constants/colors.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/screens/misc/network_error_view.dart';
@@ -26,6 +28,7 @@ class _NavBarViewState extends State<NavBarView> {
   @override
   void initState() {
     super.initState();
+    getTokenFromLocalStorage();
     _children = const [
       DashboardView(),
       SearchView(),
@@ -33,6 +36,14 @@ class _NavBarViewState extends State<NavBarView> {
       MyCartView(),
       PurchaseView(),
     ];
+  }
+
+  getTokenFromLocalStorage() async {
+    // await preferences.deleteAllValues();
+    String? token = await preferences.getValueByKey(preferences.bearerToken);
+    if(token != null && token.isNotEmpty){
+      ApplicationGlobal.bearerToken = token;
+    }
   }
 
   @override

@@ -11,7 +11,8 @@ class TextFieldWidget extends StatelessWidget {
   final TextInputType? textInputType;
   final Function(String)? onSubmitted;
   final Function(String)? onChanged;
-  const TextFieldWidget({Key? key, this.controller, this.hintText, this.focusNode, this.textInputAction, this.textCapitalization=TextCapitalization.none, this.textInputType, this.onSubmitted, this.onChanged}) : super(key: key);
+  final bool obscureText;
+  const TextFieldWidget({Key? key, this.controller, this.hintText, this.focusNode, this.textInputAction, this.textCapitalization=TextCapitalization.none, this.textInputType, this.onSubmitted, this.onChanged, this.obscureText=false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,7 @@ class TextFieldWidget extends StatelessWidget {
         keyboardType: textInputType,
         onSubmitted: onSubmitted,
         onChanged: onChanged,
+        obscureText: obscureText,
         style: TextStyle(fontSize: 16.sp, fontFamily: 'DinBold', color: AppColors.textBlack),
         decoration: InputDecoration(
           isDense: true,

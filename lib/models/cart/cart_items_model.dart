@@ -27,6 +27,7 @@ class CartItemsModel {
     this.customerTaxClassId,
     this.storeId,
     this.extensionAttributes,
+    this.message,
   });
 
   final int? id;
@@ -46,6 +47,7 @@ class CartItemsModel {
   final int? customerTaxClassId;
   final int? storeId;
   final ExtensionAttributes? extensionAttributes;
+  final String? message;
 
   factory CartItemsModel.fromJson(Map<String, dynamic> json) => CartItemsModel(
     id: json["id"] == null ? null : json["id"],
@@ -65,6 +67,7 @@ class CartItemsModel {
     customerTaxClassId: json["customer_tax_class_id"] == null ? null : json["customer_tax_class_id"],
     storeId: json["store_id"] == null ? null : json["store_id"],
     extensionAttributes: json["extension_attributes"] == null ? null : ExtensionAttributes.fromJson(json["extension_attributes"]),
+    message: json["message"] == null ? null : json["message"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -85,6 +88,7 @@ class CartItemsModel {
     "customer_tax_class_id": customerTaxClassId == null ? null : customerTaxClassId,
     "store_id": storeId == null ? null : storeId,
     "extension_attributes": extensionAttributes == null ? null : extensionAttributes!.toJson(),
+    "message": message == null ? null : message,
   };
 }
 

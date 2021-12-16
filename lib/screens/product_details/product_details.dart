@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
+import 'package:emall/config/global.dart';
 import 'package:emall/constants/colors.dart';
 import 'package:emall/managers/cart_manager/cart_manager.dart';
 import 'package:emall/managers/product_details_manager/product_details_manager.dart';
 import 'package:emall/managers/products_listing_manager/products_listing_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/models/product_model/product_model.dart';
+import 'package:emall/screens/auth/login.dart';
 import 'package:emall/screens/nav_view/cart/widgets/quantity_button.dart';
 import 'package:emall/screens/nav_view/stores/views/store_details_view.dart';
 import 'package:emall/screens/product_details/product_carousel.dart';
@@ -79,7 +81,14 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
               if (snapshot.hasData) {
                 switch (snapshot.data!.status) {
                   case Status.LOADING:
-                    return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+                    return Container(
+                      color: AppColors.purplePrimary.withOpacity(0.3),
+                      alignment: Alignment.center,
+                      child: const LoadingIndicator(
+                        indicatorType: Indicator.ballScale,
+                        colors: [AppColors.purplePrimary],
+                      ),
+                    );
                   case Status.COMPLETED:
                     return productDetails(snapshot.data?.data?.items??[]);
                   case Status.NODATAFOUND:
@@ -591,6 +600,10 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
             title: product.name??"",
             price: "${product.price}",
             onCheckout: (quantity) async {
+              if(ApplicationGlobal.bearerToken.isEmpty){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginUserView(targetView: ProductDetails(productId: widget.productId,)),));
+                return;
+              }
               setState(() {
                 isLoading = true;
               });

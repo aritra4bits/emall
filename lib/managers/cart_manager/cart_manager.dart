@@ -25,14 +25,17 @@ class CartManager{
     }
     var result;
     try{
-      String? cartId = await preferences.getValueByKey(preferences.cartId);
-      if(cartId != null){
-        print(cartId);
-        result = await CartService.getCartItems(cartId);
+      String? quoteId = await preferences.getValueByKey(preferences.quoteId);
+      if(quoteId != null){
+        result = await CartService.getCartItems("mine");
+        print("quoteId: $quoteId, result: $result");
       } else {
-        String? cartId = await createCartId();
-        if(cartId != null){
-          result = await CartService.getCartItems(cartId);
+        int? quoteId = await createCartQuoteId();
+        if(quoteId != null){
+          result = await CartService.getCartItems("mine");
+        } else {
+          _cartItemListController.sink.add(ApiResponse.error("Unauthorized"));
+          return;
         }
       }
     }catch(e){
@@ -47,36 +50,45 @@ class CartManager{
     }
   }
 
-  Future<String?> createCartId() async {
+  Future<int?> createCartQuoteId() async {
     var result;
     try{
-      result = await CartService.createCartId();
+      result = await CartService.createQuoteId();
     }catch(e){
       AppUtils.showToast('Error: $e');
     }
-    if (result != null){
-      print("$result");
-      await preferences.setValueByKey(preferences.cartId, result);
+    if (result != null && result is int){
+      print("int value: $result");
+      await preferences.setValueByKey(preferences.quoteId, result.toString());
       return result;
+    } else if(result != null && result is Map<String, dynamic>){
+      CartItemsModel cartItemListResponse = CartItemsModel.fromJson(result);
+      print(cartItemListResponse.message);
+      AppUtils.showToast(cartItemListResponse.message);
     } else {
+      print('Failed to create cart id');
       AppUtils.showToast('Failed to create cart id');
     }
   }
   
   Future<AddToCartModel?> addToCart({required String sku, required int quantity}) async {
     var result;
-    String? cartId = await preferences.getValueByKey(preferences.cartId);
+    String? quoteId = await preferences.getValueByKey(preferences.quoteId);
     Map params = {
       "cart_item": {
-        "quote_id": cartId,
+        "quote_id": quoteId,
         "sku": sku,
         "qty": quantity
       }
     };
-
     try{
-      if(cartId != null) {
-        result = await CartService.addToCartId(cartId, params);
+      if(quoteId != null) {
+        result = await CartService.addToCartId("mine", params);
+      } else {
+        int? quoteId = await createCartQuoteId();
+        if(quoteId != null){
+          result = await CartService.addToCartId("mine", params);
+        }
       }
     }catch(e){
       AppUtils.showToast('Error: $e');
@@ -95,14 +107,13 @@ class CartManager{
     }
     var result;
     try{
-      String? cartId = await preferences.getValueByKey(preferences.cartId);
-      if(cartId != null){
-        print(cartId);
-        result = await CartService.getCartTotal(cartId);
+      String? quoteId = await preferences.getValueByKey(preferences.quoteId);
+      if(quoteId != null){
+        result = await CartService.getCartTotal("mine");
       } else {
-        String? cartId = await createCartId();
-        if(cartId != null){
-          result = await CartService.getCartItems(cartId);
+        int? quoteId = await createCartQuoteId();
+        if(quoteId != null){
+          result = await CartService.getCartTotal("mine");
         }
       }
     }catch(e){
@@ -119,18 +130,18 @@ class CartManager{
 
   Future<UpdateCartItemModel?> updateCartItem({required int? itemId, required int quantity}) async {
     var result;
-    String? cartId = await preferences.getValueByKey(preferences.cartId);
+    String? quoteId = await preferences.getValueByKey(preferences.quoteId);
     Map params = {
       "cart_item": {
-        "quote_id": cartId,
+        "quote_id": quoteId,
         "item_id": itemId,
         "qty": quantity
       }
     };
 
     try{
-      if(cartId != null) {
-        result = await CartService.updateCartItem(cartId, itemId, params);
+      if(quoteId != null) {
+        result = await CartService.updateCartItem("mine", itemId, params);
       }
     }catch(e){
       AppUtils.showToast('Error: $e');
@@ -149,12 +160,8 @@ class CartManager{
 
   Future<bool?> deleteCartItem({required int? itemId}) async {
     var result;
-    String? cartId = await preferences.getValueByKey(preferences.cartId);
-
     try{
-      if(cartId != null) {
-        result = await CartService.deleteCartItem(cartId, itemId);
-      }
+      result = await CartService.deleteCartItem("mine", itemId);
     }catch(e){
       AppUtils.showToast('Error: $e');
       return false;
@@ -171,7 +178,7 @@ class CartManager{
 
   Future<AddCouponModel?> addCoupon({required String coupon, required int quantity}) async {
     var result;
-    String? cartId = await preferences.getValueByKey(preferences.cartId);
+    String? cartId = await preferences.getValueByKey(preferences.quoteId);
 
     try{
       if(cartId != null) {

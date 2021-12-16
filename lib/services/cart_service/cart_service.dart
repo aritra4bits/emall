@@ -7,9 +7,9 @@ class CartService {
 
   static final ApiBaseHelper _helper = ApiBaseHelper();
 
-  static Future<dynamic> createCartId() async {
+  static Future<dynamic> createQuoteId() async {
 
-    dynamic response = await _helper.postRequest(UrlController().createCartIdUrl(), null, setJsonHeader: false);
+    dynamic response = await _helper.postRequest(UrlController().createQuoteIdUrl(), null, setJsonHeader: false);
 
     return response;
   }

@@ -4,12 +4,27 @@ class UrlController {
   String kBaseURL = "https://mage2.fireworksmedia.com";
   ///////////////////////////////////  API End Points //////////////////////////////////////////
 
+  String registerUrlEndpoint = "/rest/default/V1/customers";
+  String loginUrlEndpoint = "/rest/default/V1/integration/customer/token";
+  String userDetailsUrlEndpoint = "/rest/default/V1/customers/me";
   String searchUrlEndpoint = "/rest/default/V1/search";
   String productUrlEndpoint = "/rest/default/V1/products";
   String categoryListUrlEndpoint = "/rest/default/V1/categories";
   String categoryDetailsUrlEndpoint = "/rest/default/V1/categories/";
-  String createCartIdUrlEndpoint = "/rest/default/V1/guest-carts";
-  String getGuestCartItemsUrlEndpoint = "/rest/default/V1/guest-carts/";
+  String createCartIdUrlEndpoint = "/rest/default/V1/carts/mine";
+  String getGuestCartItemsUrlEndpoint = "/rest/default/V1/carts/";
+
+  registerUserUrl() {
+    return kBaseURL + registerUrlEndpoint;
+  }
+
+  loginUserUrl() {
+    return kBaseURL + loginUrlEndpoint;
+  }
+
+  userDetailsUrl() {
+    return kBaseURL + userDetailsUrlEndpoint;
+  }
 
   searchUrl(String searchTerm) {
     return kBaseURL + searchUrlEndpoint + "?searchCriteria[requestName]=quick_search_container&searchCriteria[filterGroups][0][filters][0][field]=search_term&searchCriteria[filterGroups][0][filters][0][value]=$searchTerm&searchCriteria[sortOrders][0][field]=created_at&searchCriteria[sortOrders][0][direction]=DESC";
@@ -31,7 +46,7 @@ class UrlController {
     return kBaseURL + categoryDetailsUrlEndpoint + categoryId;
   }
 
-  createCartIdUrl() {
+  createQuoteIdUrl() {
     return kBaseURL + createCartIdUrlEndpoint;
   }
 

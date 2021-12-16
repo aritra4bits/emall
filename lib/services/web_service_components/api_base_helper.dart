@@ -84,9 +84,9 @@ class ApiBaseHelper {
   dynamic _returnResponse(http.Response response) {
     print("Status Code = ${response.statusCode}");
     print("Body = ${response.body}");
+    var responseJson;
+    if(response.statusCode >= 200 && response.statusCode < 500){
 
-    if(response.statusCode >= 200 && response.statusCode < 300){
-      var responseJson;
       try{
         responseJson = json.decode(response.body);
       } catch(e){
@@ -96,6 +96,7 @@ class ApiBaseHelper {
       return responseJson;
     }
     else {
+      print('Status Code: ${response.statusCode}\nBody: ${response.body}');
       AppUtils.showToast('Status Code: ${response.statusCode}\nBody: ${response.body}');
     }
   }
