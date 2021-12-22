@@ -3,6 +3,10 @@ import 'package:emall/models/cart/add_coupon_model.dart';
 import 'package:emall/models/cart/add_to_cart_model.dart';
 import 'package:emall/models/cart/cart_items_model.dart';
 import 'package:emall/models/cart/cart_total_model.dart';
+import 'package:emall/models/cart/country_code_model.dart';
+import 'package:emall/models/cart/region_code_model.dart';
+import 'package:emall/models/cart/shipping_estimate_model.dart';
+import 'package:emall/models/cart/shipping_information_model.dart';
 import 'package:emall/models/cart/update_cart_item.dart';
 import 'package:emall/services/cart_service/cart_service.dart';
 import 'package:emall/services/web_service_components/api_response.dart';
@@ -17,6 +21,18 @@ class CartManager{
 
   final _cartTotalController = BehaviorSubject<ApiResponse<CartTotalModel>?>();
   Stream<ApiResponse<CartTotalModel>?> get cartTotal => _cartTotalController.stream;
+
+  final _countryController = BehaviorSubject<ApiResponse<List<CountryCodeModel>>?>();
+  Stream<ApiResponse<List<CountryCodeModel>>?> get countryData => _countryController.stream;
+
+  final _regionController = BehaviorSubject<ApiResponse<RegionCodeModel>?>();
+  Stream<ApiResponse<RegionCodeModel>?> get regionData => _regionController.stream;
+
+  final _shippingEstimateController = BehaviorSubject<ApiResponse<List<ShippingEstimateModel>>?>();
+  Stream<ApiResponse<List<ShippingEstimateModel>>?> get shippingEstimate => _shippingEstimateController.stream;
+
+  final _cartInformationController = BehaviorSubject<ApiResponse<ShippingCartInformationModel>?>();
+  Stream<ApiResponse<ShippingCartInformationModel>?> get shippingCartInformation => _cartInformationController.stream;
 
 
   Future<void> getCartItemList({bool withLoading = true}) async {
@@ -196,12 +212,122 @@ class CartManager{
     }
   }
 
+  List<CountryCodeModel> getCountryList(){
+    return _countryController.value?.data??[];
+  }
+
+  Future<void> getCountryCodes({bool withLoading = true}) async {
+    if(withLoading) {
+      _countryController.sink.add(ApiResponse.loading("In Progress"));
+    }
+    var result;
+    try{
+      result = await CartService.getCountryCodes();
+    }catch(e){
+      AppUtils.showToast('Error: $e');
+      _countryController.sink.add(null);
+    }
+    if (result != null){
+      List<CountryCodeModel> productsResult = List<CountryCodeModel>.from(result.map((x) => CountryCodeModel.fromJson(x)));
+      _countryController.sink.add(ApiResponse.completed(productsResult));
+    } else {
+      _countryController.sink.add(ApiResponse.error("Server Error!"));
+    }
+  }
+
+  Future<void> getRegionCodes({required String countryId, bool withLoading = true}) async {
+    if(withLoading) {
+      _regionController.sink.add(ApiResponse.loading("In Progress"));
+    }
+    var result;
+    try{
+      result = await CartService.getRegionCodes(countryId);
+    }catch(e){
+      AppUtils.showToast('Error: $e');
+      _regionController.sink.add(null);
+    }
+    if (result != null){
+      print("Region result: ${result.toString()}");
+      RegionCodeModel productsResult = RegionCodeModel.fromJson(result);
+      _regionController.sink.add(ApiResponse.completed(productsResult));
+    } else {
+      _regionController.sink.add(ApiResponse.error("Server Error!"));
+    }
+  }
+
+  Future<List<ShippingEstimateModel>?> getShippingEstimate({required Map params, bool withLoading = true}) async {
+    if(withLoading) {
+      _shippingEstimateController.sink.add(ApiResponse.loading("In Progress"));
+    }
+    var result;
+    try{
+      result = await CartService.getShippingEstimate(params);
+    }catch(e){
+      AppUtils.showToast('Error: $e');
+      _shippingEstimateController.sink.add(null);
+    }
+    if (result != null){
+      try{
+        List<ShippingEstimateModel> productsResult = List<ShippingEstimateModel>.from(result.map((x) => ShippingEstimateModel.fromJson(x)));
+        _shippingEstimateController.sink.add(ApiResponse.completed(productsResult));
+        return productsResult;
+      } catch(e){
+        AppUtils.showToast(result["message"]);
+      }
+    } else {
+      _shippingEstimateController.sink.add(ApiResponse.error("Server Error!"));
+    }
+  }
+
+  Future<ShippingCartInformationModel?> setShippingInformation({required Map params, bool withLoading = true}) async {
+    if(withLoading) {
+      _cartInformationController.sink.add(ApiResponse.loading("In Progress"));
+    }
+    var result;
+    try{
+      result = await CartService.setShippingInformation(params);
+    }catch(e){
+      AppUtils.showToast('Error: $e');
+      _cartInformationController.sink.add(null);
+    }
+    if (result != null){
+      ShippingCartInformationModel productsResult = ShippingCartInformationModel.fromJson(result);
+      _cartInformationController.sink.add(ApiResponse.completed(productsResult));
+      return productsResult;
+    } else {
+      _cartInformationController.sink.add(ApiResponse.error("Server Error!"));
+    }
+  }
+
+  Future<bool?> placeOrder({required Map params}) async {
+    var result;
+    try{
+      result = await CartService.placeOrder(params);
+    }catch(e){
+      AppUtils.showToast('Error: $e');
+    }
+    if (result != null && result is String){
+      print("Order ID: $result");
+      return true;
+    } else if(result != null && result is Map) {
+      AppUtils.showToast(result["message"]);
+    } else {
+      AppUtils.showToast('Failed to place the order');
+    }
+  }
+
   dispose(){
     _cartItemListController.close();
+    _cartTotalController.close();
+    _countryController.close();
+    _regionController.close();
   }
 
   resetData(){
     _cartItemListController.sink.add(null);
+    _cartTotalController.sink.add(null);
+    _countryController.sink.add(null);
+    _regionController.sink.add(null);
   }
 }
 

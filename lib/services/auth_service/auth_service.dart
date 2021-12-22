@@ -24,4 +24,10 @@ class AuthService {
     return response;
   }
 
+  static Future<dynamic> updateUserDetails(Map params) async {
+    var httpBody = json.encode(params);
+    dynamic response = await _helper.putRequest(UrlController().userDetailsUrl(), httpBody);
+    return response;
+  }
+
 }

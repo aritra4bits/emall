@@ -53,11 +53,21 @@ class _CartViewState extends State<CartView> {
                       ),
                     );
                   case Status.COMPLETED:
+                    if(snapshot.data?.data?.items == null){
+                      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginUserView(targetView: null,),)).then((value) {
+                          if(value == true){
+                            cartManager.getCartItemList();
+                            cartManager.getCartTotal();
+                          }
+                        });
+                      });
+                    }
                     return cartView(snapshot.data?.data);
                   case Status.NODATAFOUND:
                     return SizedBox();
                   case Status.ERROR:
-                    if(snapshot.data?.message == "Unauthorized"){
+                    if(snapshot.data?.message == "Unauthorized" || snapshot.data?.data?.items == null){
                       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginUserView(targetView: null,),)).then((value) {
                           if(value == true){
@@ -81,7 +91,7 @@ class _CartViewState extends State<CartView> {
   }
 
   Widget cartView(CartItemsModel? cartItems){
-    List<CartItem> cartListItem = cartItems?.items??[];
+    List<CartItem>? cartListItem = cartItems?.items;
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -112,11 +122,11 @@ class _CartViewState extends State<CartView> {
       body: Column(
         children: [
           Expanded(
-            child: cartListItem.isNotEmpty ? SingleChildScrollView(
+            child: cartListItem != null && cartListItem.isNotEmpty ? SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  cartList(cartListItem),
+                  cartList(cartListItem, cartItems?.currency?.baseCurrencyCode),
                   cartListItem.isNotEmpty ? couponTextField() : const SizedBox(),
                 ],
               ),
@@ -125,26 +135,26 @@ class _CartViewState extends State<CartView> {
               child: Text('Cart is empty', style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontFamily: 'DinBold', fontWeight: FontWeight.bold, fontSize: 16.sp),),
             ),
           ),
-          cartListItem.isNotEmpty ? checkoutBar() : const SizedBox(),
+          cartListItem != null && cartListItem.isNotEmpty ? checkoutBar() : const SizedBox(),
         ],
       ),
     );
   }
 
 
-  Widget cartList(List<CartItem> cartListItem){
+  Widget cartList(List<CartItem> cartListItem, String? currency){
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       itemCount: cartListItem.length,
       itemBuilder: (context, index) {
-        return cartItem(index: index, itemId: cartListItem[index].itemId, imageUrl: null, title: cartListItem[index].name??'', price: "${cartListItem[index].price??''}", quantity: cartListItem[index].qty??0);
+        return cartItem(index: index, itemId: cartListItem[index].itemId, imageUrl: null, title: cartListItem[index].name??'', currency: currency, price: cartListItem[index].price?.toStringAsFixed(2)??'', quantity: cartListItem[index].qty??0);
       }
     );
   }
 
-  Widget cartItem({required int index, required int? itemId, String? imageUrl, required String title, required String price, required int quantity}){
+  Widget cartItem({required int index, required int? itemId, String? imageUrl, required String title, required String? currency, required String price, required int quantity}){
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       child: Material(
@@ -155,7 +165,7 @@ class _CartViewState extends State<CartView> {
             imageUrl != null ? Padding(
               padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 5.h),
               child: Image.asset(imageUrl, width: 100.w, fit: BoxFit.fitWidth,),
-            ) : const SizedBox(),
+            ) : SizedBox(width: 10.w,),
             Flexible(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -194,10 +204,10 @@ class _CartViewState extends State<CartView> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  AutoSizeText("RM", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
-                                  AutoSizeText('$price', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
-                                  // AutoSizeText('${price.split('.').first}.', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
-                                  // AutoSizeText(price.split('.').last, maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                                  AutoSizeText(currency??'', maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                                  // AutoSizeText(price, maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                                  AutoSizeText('${price.split('.').first}.', maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                                  AutoSizeText(price.split('.').last, maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
                                 ],
                               ),
                             ],
@@ -250,6 +260,7 @@ class _CartViewState extends State<CartView> {
               case Status.LOADING:
                 return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
               case Status.COMPLETED:
+                String? currency = snapshot.data?.data?.totals?.quoteCurrencyCode;
                 double grandTotal = snapshot.data?.data?.totals?.baseGrandTotal??0;
                 double shippingAmount = snapshot.data?.data?.totals?.shippingAmount??0;
                 return Container(
@@ -270,13 +281,13 @@ class _CartViewState extends State<CartView> {
                             Row(
                               children: [
                                 Text('Shipping: ', style: TextStyle(color: AppColors.textBlack, fontSize: 12.sp, fontFamily: 'DinBold'),),
-                                Text('RM ${shippingAmount.toStringAsFixed(2)}', style: TextStyle(color: AppColors.productPrice, fontSize: 12.sp, fontFamily: 'DinBold'),),
+                                Text('${currency??""} ${shippingAmount.toStringAsFixed(2)}', style: TextStyle(color: AppColors.productPrice, fontSize: 12.sp, fontFamily: 'DinBold'),),
                               ],
                             ),
                             Row(
                               children: [
                                 Text('TOTAL: ', style: TextStyle(color: AppColors.textBlack, fontSize: 17.sp, fontFamily: 'DinBold'),),
-                                Text('RM ${grandTotal.toStringAsFixed(2)}', style: TextStyle(color: AppColors.productPrice, fontSize: 17.sp, fontFamily: 'DinBold'),),
+                                Text('${currency??""} ${grandTotal.toStringAsFixed(2)}', style: TextStyle(color: AppColors.productPrice, fontSize: 17.sp, fontFamily: 'DinBold'),),
                               ],
                             ),
                           ],

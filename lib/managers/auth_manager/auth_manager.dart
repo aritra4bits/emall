@@ -78,6 +78,32 @@ class AuthManager{
     }
   }
 
+  Customer? getUserDetails(){
+    return _customerDetailsController.value?.data;
+  }
+
+  Future<Customer?> updateUser({required Map params, bool withLoading = true}) async {
+    if(withLoading) {
+      _customerDetailsController.sink.add(ApiResponse.loading("In Progress"));
+    }
+    var result;
+    try{
+      result = await AuthService.updateUserDetails(params);
+    }catch(e){
+      AppUtils.showToast('Error: $e');
+      _customerDetailsController.sink.add(null);
+    }
+    if (result != null){
+      Customer getUserResponse = Customer.fromJson(result);
+      _customerDetailsController.sink.add(ApiResponse.completed(getUserResponse));
+      return getUserResponse;
+    } else {
+      _customerDetailsController.sink.add(ApiResponse.error("Server Error!"));
+    }
+  }
+
+
+
   dispose(){
     _customerDetailsController.close();
   }

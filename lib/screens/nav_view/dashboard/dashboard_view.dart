@@ -1,5 +1,6 @@
-
 import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/auth_manager/auth_manager.dart';
+import 'package:emall/managers/cart_manager/cart_manager.dart';
 import 'package:emall/managers/products_listing_manager/products_listing_manager.dart';
 import 'package:emall/models/product_model/product_model.dart';
 import 'package:emall/screens/nav_view/dashboard/views/app_bar_view.dart';
@@ -43,6 +44,8 @@ class _DashboardViewState extends State<DashboardView> {
   void initState() {
     super.initState();
     productsListingManager.getOnSaleProducts();
+    authManager.getUser();
+    cartManager.getCountryCodes();
   }
 
   @override

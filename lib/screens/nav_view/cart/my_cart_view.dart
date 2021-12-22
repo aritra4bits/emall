@@ -1,3 +1,4 @@
+import 'package:emall/managers/auth_manager/auth_manager.dart';
 import 'package:emall/managers/cart_manager/cart_manager.dart';
 import 'package:emall/managers/ui_manager/cart_page_manager.dart';
 import 'package:emall/screens/nav_view/cart/views/add_new_address_view.dart';

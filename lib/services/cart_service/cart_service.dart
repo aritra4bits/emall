@@ -59,4 +59,45 @@ class CartService {
 
     return response;
   }
+
+  static Future<dynamic> getCountryCodes() async {
+
+    dynamic response = await _helper.getRequest(UrlController().getCountryCodesUrl());
+
+    return response;
+  }
+
+  static Future<dynamic> getRegionCodes(String countryId) async {
+
+    dynamic response = await _helper.getRequest(UrlController().getRegionCodesUrl(countryId));
+
+    return response;
+  }
+
+  static Future<dynamic> getShippingEstimate(Map params) async {
+
+    var httpBody = json.encode(params);
+
+    dynamic response = await _helper.postRequest(UrlController().estimateShippingUrl(), httpBody);
+
+    return response;
+  }
+
+  static Future<dynamic> setShippingInformation(Map params) async {
+
+    var httpBody = json.encode(params);
+
+    dynamic response = await _helper.postRequest(UrlController().setShippingInformationUrl(), httpBody);
+
+    return response;
+  }
+
+  static Future<dynamic> placeOrder(Map params) async {
+
+    var httpBody = json.encode(params);
+
+    dynamic response = await _helper.postRequest(UrlController().placeOrderUrl(), httpBody);
+
+    return response;
+  }
 }

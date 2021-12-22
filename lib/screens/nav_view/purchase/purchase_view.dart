@@ -1,11 +1,17 @@
 import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/auth_manager/auth_manager.dart';
+import 'package:emall/managers/cart_manager/address_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
+import 'package:emall/models/user_model/user_model.dart';
+import 'package:emall/screens/nav_view/cart/views/add_new_address_view.dart';
+import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
 import 'package:emall/widgets/purple_text_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 class PurchaseView extends StatefulWidget {
   const PurchaseView({Key? key}) : super(key: key);
@@ -18,6 +24,12 @@ class _PurchaseViewState extends State<PurchaseView> {
 
   TextEditingController searchController = TextEditingController();
   FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    authManager.getUser();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +50,7 @@ class _PurchaseViewState extends State<PurchaseView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            accountInfo(),
-            addressBook(),
+            accountInfoView(),
             recentOrders(),
           ],
         ),
@@ -58,7 +69,42 @@ class _PurchaseViewState extends State<PurchaseView> {
     );
   }
 
-  Widget accountInfo(){
+  Widget accountInfoView(){
+    return StreamBuilder<ApiResponse<Customer>?>(
+        stream: authManager.customerData,
+        builder: (BuildContext context, AsyncSnapshot<ApiResponse<Customer>?> snapshot) {
+          if (snapshot.hasData) {
+            switch (snapshot.data!.status) {
+              case Status.LOADING:
+                return Container(
+                  color: AppColors.purplePrimary.withOpacity(0.3),
+                  alignment: Alignment.center,
+                  child: const LoadingIndicator(
+                    indicatorType: Indicator.ballScale,
+                    colors: [AppColors.purplePrimary],
+                  ),
+                );
+              case Status.COMPLETED:
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    accountInfo(snapshot.data?.data),
+                    addressBook(snapshot.data?.data?.addresses)
+                  ],
+                );
+              case Status.NODATAFOUND:
+                return const SizedBox();
+              case Status.ERROR:
+                return const SizedBox();
+            }
+          }
+          return Container();
+        }
+    );
+  }
+
+  Widget accountInfo(Customer? userData){
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
       child: Column(
@@ -73,12 +119,12 @@ class _PurchaseViewState extends State<PurchaseView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('ALEXANDER LE', style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),),
+                    Flexible(child: Text("${userData?.firstname??''}${userData?.firstname != null ? " " : ""}${userData?.lastname??''}", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),)),
                     PurpleTextButton(onPressed: (){}, title: 'Edit'),
                   ],
                 ),
                 SizedBox(height: 5.h,),
-                Text('a.lee@gmail.com', style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),),
+                Text(userData?.email??"", style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),),
               ],
             ),
           ),
@@ -87,36 +133,56 @@ class _PurchaseViewState extends State<PurchaseView> {
     );
   }
   
-  Widget addressBook(){
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('ADDRESS BOOK', style: TextStyle(fontSize: 16.sp, color: AppColors.textLightBlack, fontFamily: 'DinMedium'),),
-          SizedBox(height: 10.h,),
-          cardView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('DEFAULT ADDRESS', style: TextStyle(color: AppColors.purplePrimary, fontFamily: 'DinBold', fontSize: 11.sp),),
-                    PurpleTextButton(onPressed: (){}, title: 'Edit'),
-                  ],
-                ),
-                SizedBox(height: 5.h,),
-                Text('ALEXANDER LE', style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinBold', height: 1.6, fontSize: 15.sp),),
-                Text('Lorong Morib, Taman Desa,\n58100 Kuala Lumpur,\nWilayah Persekutuan Kuala Lumpur', style: TextStyle(color: AppColors.textBlack, height: 1.6, fontFamily: 'DinMedium', fontSize: 15.sp),),
-                SizedBox(height: 4.h,),
-                Text('+6012-3456789', style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinMedium', height: 1.6, fontSize: 15.sp),),
-              ],
+  Widget addressBook(List<Address>? addresses){
+    Address? defaultAddress = addresses?.lastWhere((element) => element.defaultShipping == true);
+    if(defaultAddress != null){
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('ADDRESS BOOK', style: TextStyle(fontSize: 16.sp, color: AppColors.textLightBlack, fontFamily: 'DinMedium'),),
+            SizedBox(height: 10.h,),
+            cardView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('DEFAULT ADDRESS', style: TextStyle(color: AppColors.purplePrimary, fontFamily: 'DinBold', fontSize: 11.sp),),
+                      PurpleTextButton(onPressed: (){
+                        addressManager.setEditAddress(defaultAddress);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNewAddressView(isNewWindow: true,),));
+                      }, title: 'Edit'),
+                    ],
+                  ),
+                  SizedBox(height: 5.h,),
+                  Text("${defaultAddress.firstname??''}${defaultAddress.firstname != null ? " " : ""}${defaultAddress.lastname??''}", style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinBold', height: 1.6, fontSize: 15.sp),),
+                  defaultAddress.street != null ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: defaultAddress.street!.map((e) => Text(e, style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinMedium', height: 1.6, fontSize: 15.sp),),).toList(),
+                  ) : const SizedBox(),
+                  Text("${defaultAddress.city??''}${defaultAddress.postcode != null ? ", " : ""}${defaultAddress.postcode??''}", style: TextStyle(color: AppColors.textBlack, height: 1.6, fontFamily: 'DinMedium', fontSize: 15.sp),),
+                  defaultAddress.region?.region != null ? Text(defaultAddress.region?.region??'', style: TextStyle(color: AppColors.textBlack, height: 1.6, fontFamily: 'DinMedium', fontSize: 15.sp),) : const SizedBox(),
+                  defaultAddress.countryId != null ? Text(defaultAddress.countryId??'', style: TextStyle(color: AppColors.textBlack, height: 1.6, fontFamily: 'DinMedium', fontSize: 15.sp),) : const SizedBox(),
+                  SizedBox(height: 4.h,),
+                  Text(defaultAddress.telephone??'', style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinMedium', height: 1.6, fontSize: 15.sp),),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 20.h),
+          child: Text('No addresses found', style: TextStyle(color: AppColors.textBlack, height: 1.6, fontFamily: 'DinMedium', fontSize: 13.sp),),
+        ),
+      );
+    }
+
   }
 
   Widget recentOrders(){
