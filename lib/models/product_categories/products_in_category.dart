@@ -1,30 +1,29 @@
-
-class ProductModel {
-  ProductModel({
+class ProductsInCategoryModel {
+  ProductsInCategoryModel({
     this.items,
     this.searchCriteria,
     this.totalCount,
   });
 
-  final List<Item>? items;
+  final List<CategoryProductItem>? items;
   final SearchCriteria? searchCriteria;
   final int? totalCount;
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
-    items: json["items"] == null ? null : List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
+  factory ProductsInCategoryModel.fromJson(Map<String, dynamic> json) => ProductsInCategoryModel(
+    items: json["items"] == null ? null : List<CategoryProductItem>.from(json["items"].map((x) => CategoryProductItem.fromJson(x))),
     searchCriteria: json["search_criteria"] == null ? null : SearchCriteria.fromJson(json["search_criteria"]),
-    totalCount: json["total_count"],
+    totalCount: json["total_count"] == null ? null : json["total_count"],
   );
 
   Map<String, dynamic> toJson() => {
     "items": items == null ? null : List<dynamic>.from(items!.map((x) => x.toJson())),
     "search_criteria": searchCriteria == null ? null : searchCriteria!.toJson(),
-    "total_count": totalCount,
+    "total_count": totalCount == null ? null : totalCount,
   };
 }
 
-class Item {
-  Item({
+class CategoryProductItem {
+  CategoryProductItem({
     this.id,
     this.sku,
     this.name,
@@ -62,18 +61,18 @@ class Item {
   final List<dynamic>? tierPrices;
   final List<CustomAttribute>? customAttributes;
 
-  factory Item.fromJson(Map<String, dynamic> json) => Item(
-    id: json["id"],
-    sku: json["sku"],
-    name: json["name"],
-    attributeSetId: json["attribute_set_id"],
-    price: json["price"].toDouble(),
-    status: json["status"],
-    visibility: json["visibility"],
-    typeId: json["type_id"],
+  factory CategoryProductItem.fromJson(Map<String, dynamic> json) => CategoryProductItem(
+    id: json["id"] == null ? null : json["id"],
+    sku: json["sku"] == null ? null : json["sku"],
+    name: json["name"] == null ? null : json["name"],
+    attributeSetId: json["attribute_set_id"] == null ? null : json["attribute_set_id"],
+    price: json["price"] == null ? null : json["price"].toDouble(),
+    status: json["status"] == null ? null : json["status"],
+    visibility: json["visibility"] == null ? null : json["visibility"],
+    typeId: json["type_id"] == null ? null : json["type_id"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-    weight: json["weight"]?.toDouble(),
+    weight: json["weight"] == null ? null : json["weight"].toDouble(),
     extensionAttributes: json["extension_attributes"] == null ? null : ExtensionAttributes.fromJson(json["extension_attributes"]),
     productLinks: json["product_links"] == null ? null : List<dynamic>.from(json["product_links"].map((x) => x)),
     options: json["options"] == null ? null : List<dynamic>.from(json["options"].map((x) => x)),
@@ -83,17 +82,17 @@ class Item {
   );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "sku": sku,
-    "name": name,
-    "attribute_set_id": attributeSetId,
-    "price": price,
-    "status": status,
-    "visibility": visibility,
-    "type_id": typeId,
+    "id": id == null ? null : id,
+    "sku": sku == null ? null : sku,
+    "name": name == null ? null : name,
+    "attribute_set_id": attributeSetId == null ? null : attributeSetId,
+    "price": price == null ? null : price,
+    "status": status == null ? null : status,
+    "visibility": visibility == null ? null : visibility,
+    "type_id": typeId == null ? null : typeId,
     "created_at": createdAt == null ? null : createdAt!.toIso8601String(),
     "updated_at": updatedAt == null ? null : updatedAt!.toIso8601String(),
-    "weight": weight,
+    "weight": weight == null ? null : weight,
     "extension_attributes": extensionAttributes == null ? null : extensionAttributes!.toJson(),
     "product_links": productLinks == null ? null : List<dynamic>.from(productLinks!.map((x) => x)),
     "options": options == null ? null : List<dynamic>.from(options!.map((x) => x)),
@@ -113,12 +112,12 @@ class CustomAttribute {
   final dynamic value;
 
   factory CustomAttribute.fromJson(Map<String, dynamic> json) => CustomAttribute(
-    attributeCode: json["attribute_code"],
+    attributeCode: json["attribute_code"] == null ? null : json["attribute_code"],
     value: json["value"],
   );
 
   Map<String, dynamic> toJson() => {
-    "attribute_code": attributeCode,
+    "attribute_code": attributeCode == null ? null : attributeCode,
     "value": value,
   };
 }
@@ -153,13 +152,13 @@ class CategoryLink {
   final String? categoryId;
 
   factory CategoryLink.fromJson(Map<String, dynamic> json) => CategoryLink(
-    position: json["position"],
-    categoryId: json["category_id"],
+    position: json["position"] == null ? null : json["position"],
+    categoryId: json["category_id"] == null ? null : json["category_id"],
   );
 
   Map<String, dynamic> toJson() => {
-    "position": position,
-    "category_id": categoryId,
+    "position": position == null ? null : position,
+    "category_id": categoryId == null ? null : categoryId,
   };
 }
 
@@ -183,39 +182,51 @@ class MediaGalleryEntry {
   final String? file;
 
   factory MediaGalleryEntry.fromJson(Map<String, dynamic> json) => MediaGalleryEntry(
-    id: json["id"],
-    mediaType: json["media_type"],
+    id: json["id"] == null ? null : json["id"],
+    mediaType: json["media_type"] == null ? null : json["media_type"],
     label: json["label"],
-    position: json["position"],
-    disabled: json["disabled"],
+    position: json["position"] == null ? null : json["position"],
+    disabled: json["disabled"] == null ? null : json["disabled"],
     types: json["types"] == null ? null : List<String>.from(json["types"].map((x) => x)),
-    file: json["file"],
+    file: json["file"] == null ? null : json["file"],
   );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "media_type": mediaType,
+    "id": id == null ? null : id,
+    "media_type": mediaType == null ? null : mediaType,
     "label": label,
-    "position": position,
-    "disabled": disabled,
+    "position": position == null ? null : position,
+    "disabled": disabled == null ? null : disabled,
     "types": types == null ? null : List<dynamic>.from(types!.map((x) => x)),
-    "file": file,
+    "file": file == null ? null : file,
   };
 }
 
 class SearchCriteria {
   SearchCriteria({
     this.filterGroups,
+    this.sortOrders,
+    this.pageSize,
+    this.currentPage,
   });
 
   final List<FilterGroup>? filterGroups;
+  final List<SortOrder>? sortOrders;
+  final int? pageSize;
+  final int? currentPage;
 
   factory SearchCriteria.fromJson(Map<String, dynamic> json) => SearchCriteria(
     filterGroups: json["filter_groups"] == null ? null : List<FilterGroup>.from(json["filter_groups"].map((x) => FilterGroup.fromJson(x))),
+    sortOrders: json["sort_orders"] == null ? null : List<SortOrder>.from(json["sort_orders"].map((x) => SortOrder.fromJson(x))),
+    pageSize: json["page_size"] == null ? null : json["page_size"],
+    currentPage: json["current_page"] == null ? null : json["current_page"],
   );
 
   Map<String, dynamic> toJson() => {
     "filter_groups": filterGroups == null ? null : List<dynamic>.from(filterGroups!.map((x) => x.toJson())),
+    "sort_orders": sortOrders == null ? null : List<dynamic>.from(sortOrders!.map((x) => x.toJson())),
+    "page_size": pageSize == null ? null : pageSize,
+    "current_page": currentPage == null ? null : currentPage,
   };
 }
 
@@ -247,14 +258,34 @@ class Filter {
   final String? conditionType;
 
   factory Filter.fromJson(Map<String, dynamic> json) => Filter(
-    field: json["field"],
-    value: json["value"],
-    conditionType: json["condition_type"],
+    field: json["field"] == null ? null : json["field"],
+    value: json["value"] == null ? null : json["value"],
+    conditionType: json["condition_type"] == null ? null : json["condition_type"],
   );
 
   Map<String, dynamic> toJson() => {
-    "field": field,
-    "value": value,
-    "condition_type": conditionType,
+    "field": field == null ? null : field,
+    "value": value == null ? null : value,
+    "condition_type": conditionType == null ? null : conditionType,
+  };
+}
+
+class SortOrder {
+  SortOrder({
+    this.field,
+    this.direction,
+  });
+
+  final String? field;
+  final String? direction;
+
+  factory SortOrder.fromJson(Map<String, dynamic> json) => SortOrder(
+    field: json["field"] == null ? null : json["field"],
+    direction: json["direction"] == null ? null : json["direction"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "field": field == null ? null : field,
+    "direction": direction == null ? null : direction,
   };
 }

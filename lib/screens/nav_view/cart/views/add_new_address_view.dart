@@ -98,7 +98,11 @@ class _AddNewAddressViewState extends State<AddNewAddressView> {
               padding: EdgeInsets.all(8.sp),
               child: GreyRoundButton(
                 onPressed: () {
-                  cartPageManager.updatePageIndex(1);
+                  if(widget.isNewWindow){
+                    Navigator.pop(context);
+                  } else {
+                    cartPageManager.updatePageIndex(1);
+                  }
                 },
                 icon: Icons.arrow_back_ios_rounded,
               ),
@@ -112,119 +116,128 @@ class _AddNewAddressViewState extends State<AddNewAddressView> {
                   fontWeight: FontWeight.w600),
             ),
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 20.h,
-                ),
-                // textFieldWithTitle(title: 'Email', textCapitalization: TextCapitalization.none, textInputType: TextInputType.emailAddress, textInputAction: TextInputAction.next),
-                // Padding(
-                //   padding: EdgeInsets.symmetric(horizontal: 20.w),
-                //   child: Text('You can create an account after checkout.', style: TextStyle(color: AppColors.textBlack, fontWeight: FontWeight.w300, fontSize: 14.sp),),
-                // ),
-                // Divider(color: AppColors.textBlack, height: 70.h, thickness: 1.sp, indent: 20.w, endIndent: 20.w,),
-                textFieldWithTitle(
-                    title: 'First Name',
-                    controller: firstNameController,
-                    textCapitalization: TextCapitalization.words,
-                    textInputType: TextInputType.name,
-                    textInputAction: TextInputAction.next),
-                textFieldWithTitle(
-                    title: 'Last Name',
-                    controller: lastNameController,
-                    textCapitalization: TextCapitalization.words,
-                    textInputType: TextInputType.name,
-                    textInputAction: TextInputAction.next),
-                textFieldWithTitle(
-                    title: 'Street Address',
-                    controller: streetAddressController,
-                    textCapitalization: TextCapitalization.words,
-                    textInputType: TextInputType.streetAddress,
-                    textInputAction: TextInputAction.next),
-                textFieldWithTitle(
-                    title: 'City',
-                    controller: cityController,
-                    textCapitalization: TextCapitalization.words,
-                    textInputType: TextInputType.streetAddress,
-                    textInputAction: TextInputAction.next),
-                // textFieldWithTitle(title: 'State', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
-                textFieldWithTitle(
-                    title: 'Zip/Postal Code',
-                    controller: zipCodeController,
-                    textCapitalization: TextCapitalization.none,
-                    textInputType: TextInputType.number,
-                    textInputAction: TextInputAction.next),
-                // textFieldWithTitle(title: 'Country', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
-                StreamBuilder<ApiResponse<List<CountryCodeModel>>?>(
-                    stream: cartManager.countryData,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<ApiResponse<List<CountryCodeModel>>?>
-                            snapshot) {
-                      if (snapshot.hasData) {
-                        switch (snapshot.data!.status) {
-                          case Status.LOADING:
-                            return const Center(
-                                child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(
-                                  AppColors.purplePrimary),
-                            ));
-                          case Status.COMPLETED:
-                            return countrySelector(
-                                title: 'Country',
-                                countries: snapshot.data?.data != null
-                                    ? snapshot.data?.data!
-                                        .where((element) =>
-                                            element.availableRegions != null)
-                                        .toList()
-                                    : []);
-                          case Status.NODATAFOUND:
-                            return SizedBox();
-                          case Status.ERROR:
-                            return SizedBox();
-                        }
-                      }
-                      return Container();
-                    }),
-                StreamBuilder<ApiResponse<RegionCodeModel>?>(
-                    stream: cartManager.regionData,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<ApiResponse<RegionCodeModel>?> snapshot) {
-                      if (snapshot.hasData) {
-                        switch (snapshot.data!.status) {
-                          case Status.LOADING:
-                            return const Center(
-                                child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(
-                                  AppColors.purplePrimary),
-                            ));
-                          case Status.COMPLETED:
+          body: Stack(
+            children: [
+              SizedBox.expand(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 20.h,
+                      ),
+                      // textFieldWithTitle(title: 'Email', textCapitalization: TextCapitalization.none, textInputType: TextInputType.emailAddress, textInputAction: TextInputAction.next),
+                      // Padding(
+                      //   padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      //   child: Text('You can create an account after checkout.', style: TextStyle(color: AppColors.textBlack, fontWeight: FontWeight.w300, fontSize: 14.sp),),
+                      // ),
+                      // Divider(color: AppColors.textBlack, height: 70.h, thickness: 1.sp, indent: 20.w, endIndent: 20.w,),
+                      textFieldWithTitle(
+                          title: 'First Name',
+                          controller: firstNameController,
+                          textCapitalization: TextCapitalization.words,
+                          textInputType: TextInputType.name,
+                          textInputAction: TextInputAction.next),
+                      textFieldWithTitle(
+                          title: 'Last Name',
+                          controller: lastNameController,
+                          textCapitalization: TextCapitalization.words,
+                          textInputType: TextInputType.name,
+                          textInputAction: TextInputAction.next),
+                      textFieldWithTitle(
+                          title: 'Street Address',
+                          controller: streetAddressController,
+                          textCapitalization: TextCapitalization.words,
+                          textInputType: TextInputType.streetAddress,
+                          textInputAction: TextInputAction.next),
+                      textFieldWithTitle(
+                          title: 'City',
+                          controller: cityController,
+                          textCapitalization: TextCapitalization.words,
+                          textInputType: TextInputType.streetAddress,
+                          textInputAction: TextInputAction.next),
+                      // textFieldWithTitle(title: 'State', textCapitalization: TextCapitalization.words, textInputType: TextInputType.streetAddress, textInputAction: TextInputAction.next),
+                      textFieldWithTitle(
+                          title: 'Zip/Postal Code',
+                          controller: zipCodeController,
+                          textCapitalization: TextCapitalization.none,
+                          textInputType: TextInputType.number,
+                          textInputAction: TextInputAction.next),
+                      // textFieldWithTitle(title: 'Country', textCapitalization: TextCapitalization.words, textInputType: TextInputType.name, textInputAction: TextInputAction.next),
+                      StreamBuilder<ApiResponse<List<CountryCodeModel>>?>(
+                          stream: cartManager.countryData,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<ApiResponse<List<CountryCodeModel>>?>
+                                  snapshot) {
+                            if (snapshot.hasData) {
+                              switch (snapshot.data!.status) {
+                                case Status.LOADING:
+                                  return const Center(
+                                      child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation(
+                                        AppColors.purplePrimary),
+                                  ));
+                                case Status.COMPLETED:
+                                  return countrySelector(
+                                      title: 'Country',
+                                      countries: snapshot.data?.data != null
+                                          ? snapshot.data?.data!
+                                              .where((element) =>
+                                                  element.availableRegions != null)
+                                              .toList()
+                                          : []);
+                                case Status.NODATAFOUND:
+                                  return SizedBox();
+                                case Status.ERROR:
+                                  return SizedBox();
+                              }
+                            }
+                            return Container();
+                          }),
+                      StreamBuilder<ApiResponse<RegionCodeModel>?>(
+                          stream: cartManager.regionData,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<ApiResponse<RegionCodeModel>?> snapshot) {
+                            if (snapshot.hasData) {
+                              switch (snapshot.data!.status) {
+                                case Status.LOADING:
+                                  return const Center(
+                                      child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation(
+                                        AppColors.purplePrimary),
+                                  ));
+                                case Status.COMPLETED:
+                                  return stateSelector(
+                                      title: 'State',
+                                      regionCodes: snapshot.data?.data);
+                                case Status.NODATAFOUND:
+                                  return SizedBox();
+                                case Status.ERROR:
+                                  return SizedBox();
+                              }
+                            }
                             return stateSelector(
                                 title: 'State',
-                                regionCodes: snapshot.data?.data);
-                          case Status.NODATAFOUND:
-                            return SizedBox();
-                          case Status.ERROR:
-                            return SizedBox();
-                        }
-                      }
-                      return stateSelector(
-                          title: 'State',
-                          regionCodes: RegionCodeModel(availableRegions: []));
-                    }),
-                textFieldWithTitle(
-                    title: 'Phone Number',
-                    controller: phoneController,
-                    textCapitalization: TextCapitalization.none,
-                    textInputType: TextInputType.phone,
-                    textInputAction: TextInputAction.done),
-                SizedBox(
-                  height: 20.h,
+                                regionCodes: RegionCodeModel(availableRegions: []));
+                          }),
+                      textFieldWithTitle(
+                          title: 'Phone Number',
+                          controller: phoneController,
+                          textCapitalization: TextCapitalization.none,
+                          textInputType: TextInputType.phone,
+                          textInputAction: TextInputAction.done),
+                      SizedBox(height: 54.h,),
+                    ],
+                  ),
                 ),
-                nextButton(),
-              ],
-            ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: nextButton(),
+              )
+            ],
           ),
         ),
       ),

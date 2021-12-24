@@ -51,6 +51,10 @@ class UrlController {
     return kBaseURL + categoryDetailsUrlEndpoint + categoryId;
   }
 
+  productsInCategoryUrl(String categoryId, String pageSize, String currentPage) {
+    return kBaseURL + productUrlEndpoint + "?searchCriteria[filterGroups][0][filters][0][field]=category_id&searchCriteria[filterGroups][0][filters][0][value]=$categoryId&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[sortOrders][0][field]=created_at&searchCriteria[sortOrders][0][direction]=DESC&searchCriteria[pageSize]=$pageSize&searchCriteria[currentPage]=$currentPage";
+  }
+
   createQuoteIdUrl() {
     return kBaseURL + createCartIdUrlEndpoint;
   }

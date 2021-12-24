@@ -44,7 +44,7 @@ class ProductCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 5.h,),
-                Expanded(flex: 4, child: Image.network(productImageUrl, fit: BoxFit.fitHeight,)),
+                Expanded(flex: 4, child: productImageUrl.isNotEmpty ? Image.network(productImageUrl, fit: BoxFit.fitHeight,) : const Icon(Icons.error_outline, color: AppColors.purplePrimary,)),
                 const Spacer(flex: 1,),
                 Row(
                   children: [
@@ -54,22 +54,29 @@ class ProductCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Row(
+                    discountPrice.isNotEmpty ? Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AutoSizeText("RM", maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
                         AutoSizeText(discountPrice.split('.').first + '.', maxLines: 1, maxFontSize: 20.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 20.sp, color: AppColors.productPrice),),
                         AutoSizeText(discountPrice.split('.').last, maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
                       ],
+                    ) : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AutoSizeText("RM", maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
+                        AutoSizeText(actualPrice.split('.').first + '.', maxLines: 1, maxFontSize: 20.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 20.sp, color: AppColors.productPrice),),
+                        AutoSizeText(actualPrice.split('.').last, maxLines: 1, maxFontSize: 14.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 14.sp, color: AppColors.productPrice),),
+                      ],
                     ),
                     SizedBox(width: 5.w,),
-                    Flexible(
+                    discountPrice.isEmpty ? Flexible(
                       child: AutoSizeText(
                         actualPrice,
                         maxLines: 1, maxFontSize: 12.sp, minFontSize: 10.sp, stepGranularity: 1.sp,
                         style: TextStyle(decoration: TextDecoration.lineThrough, fontSize: 12.sp),
                       ),
-                    ),
+                    ) : const SizedBox(),
                   ],
                 ),
                 Row(

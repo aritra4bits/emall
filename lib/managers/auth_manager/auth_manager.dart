@@ -72,7 +72,11 @@ class AuthManager{
     }
     if (result != null){
       Customer getUserResponse = Customer.fromJson(result);
-      _customerDetailsController.sink.add(ApiResponse.completed(getUserResponse));
+      if(getUserResponse.id != null){
+        _customerDetailsController.sink.add(ApiResponse.completed(getUserResponse));
+      } else if(getUserResponse.message != null){
+        _customerDetailsController.sink.add(ApiResponse.error(getUserResponse.message));
+      }
     } else {
       _customerDetailsController.sink.add(ApiResponse.error("Server Error!"));
     }

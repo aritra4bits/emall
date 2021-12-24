@@ -1,16 +1,24 @@
 class UserModel {
   UserModel({
     this.customer,
+    this.message,
+    this.parameters,
   });
 
   final Customer? customer;
+  final String? message;
+  final Parameters? parameters;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
     customer: json["customer"] == null ? null : Customer.fromJson(json["customer"]),
+    message: json["message"] == null ? null : json["message"],
+    parameters: json["parameters"] == null ? null : Parameters.fromJson(json["parameters"]),
   );
 
   Map<String, dynamic> toJson() => {
     "customer": customer == null ? null : customer!.toJson(),
+    "message": message == null ? null : message,
+    "parameters": parameters == null ? null : parameters!.toJson(),
   };
 }
 
@@ -26,11 +34,14 @@ class Customer {
     this.email,
     this.firstname,
     this.lastname,
+    this.gender,
     this.storeId,
     this.websiteId,
     this.addresses,
     this.disableAutoGroupChange,
     this.extensionAttributes,
+    this.message,
+    this.parameters,
   });
 
   final int? id;
@@ -43,11 +54,14 @@ class Customer {
   final String? email;
   final String? firstname;
   final String? lastname;
+  final int? gender;
   final int? storeId;
   final int? websiteId;
   final List<Address>? addresses;
   final int? disableAutoGroupChange;
   final ExtensionAttributes? extensionAttributes;
+  final String? message;
+  final Parameters? parameters;
 
   factory Customer.fromJson(Map<String, dynamic> json) => Customer(
     id: json["id"] == null ? null : json["id"],
@@ -60,11 +74,14 @@ class Customer {
     email: json["email"] == null ? null : json["email"],
     firstname: json["firstname"] == null ? null : json["firstname"],
     lastname: json["lastname"] == null ? null : json["lastname"],
+    gender: json["gender"] == null ? null : json["gender"],
     storeId: json["store_id"] == null ? null : json["store_id"],
     websiteId: json["website_id"] == null ? null : json["website_id"],
     addresses: json["addresses"] == null ? null : List<Address>.from(json["addresses"].map((x) => Address.fromJson(x))),
     disableAutoGroupChange: json["disable_auto_group_change"] == null ? null : json["disable_auto_group_change"],
     extensionAttributes: json["extension_attributes"] == null ? null : ExtensionAttributes.fromJson(json["extension_attributes"]),
+    message: json["message"] == null ? null : json["message"],
+    parameters: json["parameters"] == null ? null : Parameters.fromJson(json["parameters"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -78,13 +95,33 @@ class Customer {
     "email": email == null ? null : email,
     "firstname": firstname == null ? null : firstname,
     "lastname": lastname == null ? null : lastname,
+    "gender": gender == null ? null : gender,
     "store_id": storeId == null ? null : storeId,
     "website_id": websiteId == null ? null : websiteId,
     "addresses": addresses == null ? null : List<dynamic>.from(addresses!.map((x) => x.toJson())),
     "disable_auto_group_change": disableAutoGroupChange == null ? null : disableAutoGroupChange,
     "extension_attributes": extensionAttributes == null ? null : extensionAttributes!.toJson(),
+    "message": message == null ? null : message,
+    "parameters": parameters == null ? null : parameters!.toJson(),
   };
 }
+
+class Parameters {
+  Parameters({
+    this.resources,
+  });
+
+  final String? resources;
+
+  factory Parameters.fromJson(Map<String, dynamic> json) => Parameters(
+    resources: json["resources"] == null ? null : json["resources"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "resources": resources == null ? null : resources,
+  };
+}
+
 
 class Address {
   Address({

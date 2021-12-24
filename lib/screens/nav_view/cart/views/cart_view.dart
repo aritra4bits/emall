@@ -80,7 +80,7 @@ class _CartViewState extends State<CartView> {
                         child: Text("Please login to view cart"),
                       );
                     }
-                    return SizedBox();
+                    return const SizedBox();
                 }
               }
               return Container();

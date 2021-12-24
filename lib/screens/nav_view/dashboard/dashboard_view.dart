@@ -78,7 +78,7 @@ class _DashboardViewState extends State<DashboardView> {
           if (snapshot.hasData) {
             switch (snapshot.data!.status) {
               case Status.LOADING:
-                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
+                return SizedBox(height: 200.sp, child: const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),)));
               case Status.COMPLETED:
                 return onSaleProductsView(snapshot.data?.data?.items??[]);
               case Status.NODATAFOUND:

@@ -2,8 +2,10 @@ import 'package:auto_size_text_pk/auto_size_text_pk.dart';
 import 'package:emall/constants/colors.dart';
 import 'package:emall/managers/auth_manager/auth_manager.dart';
 import 'package:emall/managers/cart_manager/address_manager.dart';
+import 'package:emall/managers/cart_manager/cart_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/models/user_model/user_model.dart';
+import 'package:emall/screens/auth/login.dart';
 import 'package:emall/screens/nav_view/cart/views/add_new_address_view.dart';
 import 'package:emall/services/web_service_components/api_response.dart';
 import 'package:emall/widgets/grey_button.dart';
@@ -12,6 +14,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_indicator/loading_indicator.dart';
+
+import 'edit_profile.dart';
 
 class PurchaseView extends StatefulWidget {
   const PurchaseView({Key? key}) : super(key: key);
@@ -96,6 +100,19 @@ class _PurchaseViewState extends State<PurchaseView> {
               case Status.NODATAFOUND:
                 return const SizedBox();
               case Status.ERROR:
+                if(snapshot.data?.message != null && snapshot.data?.data?.id == null){
+                  WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginUserView(targetView: null,),)).then((value) {
+                      if(value == true){
+                        cartManager.getCartItemList();
+                        cartManager.getCartTotal();
+                      }
+                    });
+                  });
+                  return const Center(
+                    child: Text("Please login to view account information"),
+                  );
+                }
                 return const SizedBox();
             }
           }
@@ -105,32 +122,39 @@ class _PurchaseViewState extends State<PurchaseView> {
   }
 
   Widget accountInfo(Customer? userData){
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('ACCOUNT INFORMATION', style: TextStyle(fontSize: 16.sp, color: AppColors.textLightBlack, fontFamily: 'DinMedium'),),
-          SizedBox(height: 10.h,),
-          cardView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(child: Text("${userData?.firstname??''}${userData?.firstname != null ? " " : ""}${userData?.lastname??''}", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),)),
-                    PurpleTextButton(onPressed: (){}, title: 'Edit'),
-                  ],
-                ),
-                SizedBox(height: 5.h,),
-                Text(userData?.email??"", style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),),
-              ],
+    if(userData?.id != null){
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('ACCOUNT INFORMATION', style: TextStyle(fontSize: 16.sp, color: AppColors.textLightBlack, fontFamily: 'DinMedium'),),
+            SizedBox(height: 10.h,),
+            cardView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(child: Text("${userData?.firstname??''}${userData?.firstname != null ? " " : ""}${userData?.lastname??''}", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),)),
+                      PurpleTextButton(onPressed: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileView(),));
+                      }, title: 'Edit'),
+                    ],
+                  ),
+                  SizedBox(height: 5.h,),
+                  Text(userData?.email??"", style: TextStyle(color: AppColors.textBlack, fontFamily: 'DinRegular', fontWeight: FontWeight.bold, fontSize: 15.sp),),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    } else {
+      return const SizedBox();
+    }
+
   }
   
   Widget addressBook(List<Address>? addresses){

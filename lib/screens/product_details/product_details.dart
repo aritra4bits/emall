@@ -186,6 +186,9 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   }
 
   Widget productPriceDetailsCard(Item product) {
+    int specialPriceIndex = product.customAttributes!.indexWhere((element) => element.attributeCode == "special_price");
+    String? specialPrice = specialPriceIndex >= 0 ? double.parse(product.customAttributes![specialPriceIndex].value).toStringAsFixed(2) : null;
+    String? price = product.price?.toStringAsFixed(2);
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.sp),
@@ -202,8 +205,8 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText("RM", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
-                  AutoSizeText("${product.price}", maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
-                  // AutoSizeText("50", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
+                  AutoSizeText("${specialPrice != null ? specialPrice.split('.').first : price?.split(".").first}.", maxLines: 1, maxFontSize: 26.sp, minFontSize: 14.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 26.sp, color: AppColors.productPrice),),
+                  AutoSizeText("${specialPrice != null ? specialPrice.split('.').last : price?.split(".").last}", maxLines: 1, maxFontSize: 16.sp, minFontSize: 12.sp, stepGranularity: 1.sp, style: TextStyle(fontSize: 16.sp, color: AppColors.productPrice),),
                 ],
               ),
               const Spacer(),

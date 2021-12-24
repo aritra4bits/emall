@@ -19,4 +19,11 @@ class CategoryService {
     return response;
   }
 
+  static Future<dynamic> getProductsInCategory(String categoryId, String pageSize, String currentPage) async {
+
+    dynamic response = await _helper.getRequest(UrlController().productsInCategoryUrl(categoryId, pageSize, currentPage));
+
+    return response;
+  }
+
 }
