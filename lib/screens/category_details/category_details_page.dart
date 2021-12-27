@@ -24,10 +24,48 @@ class CategoryDetailsPage extends StatefulWidget {
 
 class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
 
+  final ScrollController _scrollController = ScrollController();
+  bool hasNextPage = false;
+  bool isLoadingProducts = false;
+  bool wasAddedToList = false;
+  int pageSize = 6;
+  int currentPage = 1;
+  List<CategoryProductItem> productItems = [];
+
   @override
   void initState() {
     super.initState();
-    categoryListManager.getProductsInCategory(categoryId: widget.categoryId, pageSize: "10", currentPage: "1");
+    categoryListManager.getProductsInCategory(categoryId: widget.categoryId, pageSize: pageSize.toString(), currentPage: currentPage.toString());
+    currentPage++;
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      if(_scrollController.hasClients) {
+        _scrollController.addListener(() async {
+          if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
+              !_scrollController.position.outOfRange) {
+            print("Reached bottom");
+            if(hasNextPage){
+              setState(() {
+                isLoadingProducts = true;
+              });
+              await categoryListManager.getProductsInCategory(categoryId: widget.categoryId, pageSize: pageSize.toString(), currentPage: currentPage.toString(), withLoading: false);
+              wasAddedToList = false;
+              setState(() {
+                isLoadingProducts = false;
+              });
+              hasNextPage = false;
+              currentPage++;
+            }
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.removeListener(() { });
+    _scrollController.dispose();
   }
 
   @override
@@ -45,20 +83,27 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
         titleSpacing: 0,
         title: AutoSizeText(widget.titleBarText.toUpperCase(), style: TextStyle(color: AppColors.textLightBlack.withOpacity(0.7), fontWeight: FontWeight.w600),),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('STORES', style: TextStyle(fontSize: 16.sp, color: AppColors.textLightBlack, fontFamily: 'DinBold'),),
-            SizedBox(height: 10.h,),
-            storeNameSection(context: context, title: 'SONY STORE'),
-            SizedBox(height: 40.h,),
-            storeDetails(),
-            SizedBox(height: 30.h,),
-            productsInCategory(),
-          ],
-        ),
+      body: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          // SliverPadding(
+          //   padding: EdgeInsets.symmetric(horizontal: 15.w),
+          //   sliver: SliverList(
+          //     delegate: SliverChildListDelegate(
+          //       [
+          //         Text('STORES', style: TextStyle(fontSize: 16.sp, color: AppColors.textLightBlack, fontFamily: 'DinBold'),),
+          //         SizedBox(height: 10.h,),
+          //         storeNameSection(context: context, title: 'SONY STORE'),
+          //         SizedBox(height: 40.h,),
+          //         storeDetails(),
+          //         SizedBox(height: 30.h,),
+          //
+          //       ]
+          //     ),
+          //   ),
+          // ),
+          productsInCategory(),
+        ],
       ),
     );
   }
@@ -104,40 +149,63 @@ class _CategoryDetailsPageState extends State<CategoryDetailsPage> {
   }
 
   Widget productsInCategory(){
-    return StreamBuilder<ApiResponse<ProductsInCategoryModel>?>(
-        stream: categoryListManager.productsInCategory,
-        builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductsInCategoryModel>?> snapshot) {
-          if (snapshot.hasData) {
-            switch (snapshot.data!.status) {
-              case Status.LOADING:
-                return SizedBox(height: 200.sp, child: const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),)));
-              case Status.COMPLETED:
-                return productsInCategoryView(snapshot.data?.data?.items??[]);
-              case Status.NODATAFOUND:
-                return const SizedBox();
-              case Status.ERROR:
-                return const SizedBox();
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
+      sliver: StreamBuilder<ApiResponse<ProductsInCategoryModel>?>(
+          stream: categoryListManager.productsInCategory,
+          builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductsInCategoryModel>?> snapshot) {
+            if (snapshot.hasData) {
+              switch (snapshot.data!.status) {
+                case Status.LOADING:
+                  return SliverToBoxAdapter(child: SizedBox(height: 200.sp, child: const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),))));
+                case Status.COMPLETED:
+                  if(snapshot.data?.data?.items != null && snapshot.data!.data!.items!.length >= pageSize){
+                    hasNextPage = true;
+                  }else{
+                    hasNextPage = false;
+                  }
+                  if(!wasAddedToList && snapshot.data?.data?.items != null){
+                    productItems.addAll(snapshot.data!.data!.items!);
+                    wasAddedToList = true;
+                  }
+                  productItems.toSet().toList();
+                  return productsInCategoryView(snapshot.data?.data?.items??[]);
+                case Status.NODATAFOUND:
+                  return const SliverToBoxAdapter(child: SizedBox());
+                case Status.ERROR:
+                  return const SliverToBoxAdapter(child: SizedBox());
+              }
             }
+            return const SliverToBoxAdapter(child: SizedBox());
           }
-          return Container();
-        }
+      ),
     );
   }
 
   Widget productsInCategoryView(List<CategoryProductItem> products) {
-    return GridView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8),
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: products.length,
-        itemBuilder: (BuildContext ctx, index) {
-          int specialPriceIndex = products[index].customAttributes!.indexWhere((element) => element.attributeCode == "special_price");
-          return ProductCard(productId: "${products[index].id}", productImageUrl: products[index].mediaGalleryEntries != null && products[index].mediaGalleryEntries!.isNotEmpty ? "https://mage2.fireworksmedia.com/pub/media/catalog/product${products[index].mediaGalleryEntries?.first.file}" : "", productTitle: products[index].name!, discountPrice: specialPriceIndex >= 0 ? products[index].customAttributes![specialPriceIndex].value : "", actualPrice: "${products[index].price?.toStringAsFixed(2)}", rating: 4.4, reviewsCount: 5);
-        });
+    return SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 8.0,
+            crossAxisSpacing: 8.0,
+            childAspectRatio: 0.75),
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            if(index == productItems.length){
+              if(isLoadingProducts){
+                return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),
+                    ));
+              }else{
+                return const SizedBox();
+              }
+            }
+            int specialPriceIndex = productItems[index].customAttributes!.indexWhere((element) => element.attributeCode == "special_price");
+            return ProductCard(productId: "${productItems[index].id}", productImageUrl: productItems[index].mediaGalleryEntries != null && productItems[index].mediaGalleryEntries!.isNotEmpty ? "https://mage2.fireworksmedia.com/pub/media/catalog/product${productItems[index].mediaGalleryEntries?.first.file}" : "", productTitle: productItems[index].name!, discountPrice: specialPriceIndex >= 0 ? productItems[index].customAttributes![specialPriceIndex].value : "", actualPrice: "${productItems[index].price?.toStringAsFixed(2)}", rating: 4.4, reviewsCount: 5);
+          },
+          childCount: productItems.length+1,
+        ),
+    );
   }
 }

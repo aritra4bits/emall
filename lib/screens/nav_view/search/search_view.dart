@@ -44,20 +44,25 @@ class _SearchViewState extends State<SearchView> {
         titleSpacing: 0,
         title: searchBar(context),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 15.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20.h,),
-            storeDetails(),
-            SizedBox(height: 30.h,),
-            storeNameSection(title: 'SONY STORE'),
-            SizedBox(height: 40.h,),
-            productList(),
-            SizedBox(height: 20.h,),
-          ],
-        ),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 15.w),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                  [
+                    SizedBox(height: 20.h,),
+                    storeDetails(),
+                    SizedBox(height: 30.h,),
+                    // storeNameSection(title: 'SONY STORE'),
+                    // SizedBox(height: 40.h,),
+                  ]
+              ),
+            ),
+          ),
+          productList(),
+          SliverToBoxAdapter(child: SizedBox(height: 20.h,)),
+        ],
       ),
     );
   }
@@ -145,39 +150,44 @@ class _SearchViewState extends State<SearchView> {
   }
 
   Widget productList(){
-    return StreamBuilder<ApiResponse<ProductModel>?>(
-        stream: productDetailsManager.productList,
-        builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
-          if (snapshot.hasData) {
-            switch (snapshot.data!.status) {
-              case Status.LOADING:
-                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),));
-              case Status.COMPLETED:
-                return productListView(snapshot.data?.data?.items??[]);
-              case Status.NODATAFOUND:
-                return SizedBox();
-              case Status.ERROR:
-                return SizedBox();
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 15.w),
+      sliver: StreamBuilder<ApiResponse<ProductModel>?>(
+          stream: productDetailsManager.productList,
+          builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
+            if (snapshot.hasData) {
+              switch (snapshot.data!.status) {
+                case Status.LOADING:
+                  return SliverToBoxAdapter(child: SizedBox(height: 200.sp, child: const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),))));
+                case Status.COMPLETED:
+                  return productListView(snapshot.data?.data?.items??[]);
+                case Status.NODATAFOUND:
+                  return const SliverToBoxAdapter(child: SizedBox());
+                case Status.ERROR:
+                  return const SliverToBoxAdapter(child: SizedBox());
+              }
             }
+            return const SliverToBoxAdapter(child: SizedBox());
           }
-          return Container();
-        }
+      ),
     );
   }
 
   Widget productListView(List<Item> items){
     if(items.isEmpty){
-      return const Center(
-        child: Text("No products available. Try a different search term."),
+      return const SliverToBoxAdapter(
+        child: Center(
+          child: Text("No products available. Try a different search term."),
+        ),
       );
     }
-    return ListView.builder(
-      itemCount: items.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        return productCard(imageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${items[index].mediaGalleryEntries!.first.file!}", title: items[index].name!);
-      },
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            return productCard(imageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${items[index].mediaGalleryEntries!.first.file!}", title: items[index].name!);
+          },
+        childCount: items.length,
+      ),
     );
   }
 

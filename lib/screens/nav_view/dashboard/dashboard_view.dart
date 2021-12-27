@@ -52,60 +52,72 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const AppBarView(),
-            const TopBannerView(),
-            const CategoryView(),
-            const HeadingText(title: 'ON SALE'),
-            onSaleProducts(),
-            bannerAd(),
-            SizedBox(height: 30.h,),
-            const HeadingText(title: 'TRENDING'),
-            trendingProducts(),
-          ],
-        ),
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                const AppBarView(),
+                const TopBannerView(),
+                const CategoryView(),
+                const HeadingText(title: 'ON SALE'),
+              ]
+            ),
+          ),
+          onSaleProducts(),
+          SliverList(
+            delegate: SliverChildListDelegate(
+                [
+                  bannerAd(),
+                  SizedBox(height: 30.h,),
+                  const HeadingText(title: 'TRENDING'),
+                ]
+            ),
+          ),
+          trendingProducts(),
+        ],
       ),
     );
   }
 
   Widget onSaleProducts(){
-    return StreamBuilder<ApiResponse<ProductModel>?>(
-        stream: productsListingManager.onSaleProductList,
-        builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
-          if (snapshot.hasData) {
-            switch (snapshot.data!.status) {
-              case Status.LOADING:
-                return SizedBox(height: 200.sp, child: const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),)));
-              case Status.COMPLETED:
-                return onSaleProductsView(snapshot.data?.data?.items??[]);
-              case Status.NODATAFOUND:
-                return SizedBox();
-              case Status.ERROR:
-                return SizedBox();
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+      sliver: StreamBuilder<ApiResponse<ProductModel>?>(
+          stream: productsListingManager.onSaleProductList,
+          builder: (BuildContext context, AsyncSnapshot<ApiResponse<ProductModel>?> snapshot) {
+            if (snapshot.hasData) {
+              switch (snapshot.data!.status) {
+                case Status.LOADING:
+                  return SliverToBoxAdapter(child: SizedBox(height: 200.sp, child: const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(AppColors.purplePrimary),))));
+                case Status.COMPLETED:
+                  return onSaleProductsView(snapshot.data?.data?.items??[]);
+                case Status.NODATAFOUND:
+                  return const SliverToBoxAdapter(child: SizedBox());
+                case Status.ERROR:
+                  return const SliverToBoxAdapter(child: SizedBox());
+              }
             }
+            return const SliverToBoxAdapter(child: SizedBox());
           }
-          return Container();
-        }
+      ),
     );
   }
 
   Widget onSaleProductsView(List<Item> products) {
-    return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8),
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: products.length,
-        itemBuilder: (BuildContext ctx, index) {
-          return ProductCard(productId: "${products[index].id}", productImageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${products[index].mediaGalleryEntries!.first.file!}", productTitle: products[index].name!, discountPrice: products[index].customAttributes![products[index].customAttributes!.indexWhere((element) => element.attributeCode == "special_price")].value, actualPrice: "${products[index].price}", rating: 4.4, reviewsCount: 5);
-        });
+    return SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 8.0,
+            crossAxisSpacing: 8.0,
+            childAspectRatio: 0.75),
+        delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return ProductCard(productId: "${products[index].id}", productImageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${products[index].mediaGalleryEntries!.first.file!}", productTitle: products[index].name!, discountPrice: products[index].customAttributes![products[index].customAttributes!.indexWhere((element) => element.attributeCode == "special_price")].value, actualPrice: "${products[index].price}", rating: 4.4, reviewsCount: 5);
+          },
+          childCount: products.length,
+        ),
+    );
   }
 
   Widget bannerAd(){
@@ -116,18 +128,21 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Widget trendingProducts() {
-    return GridView.builder(
+    return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8),
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: trendingProductItems.length,
-        itemBuilder: (BuildContext ctx, index) {
-          return ProductCard(productId: "", productImageUrl: trendingProductItems[index][0], productTitle: trendingProductItems[index][1], discountPrice: trendingProductItems[index][2], actualPrice: trendingProductItems[index][3], rating: trendingProductItems[index][4], reviewsCount: trendingProductItems[index][5]);
-        });
+      sliver: SliverGrid(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 8.0,
+              crossAxisSpacing: 8.0,
+              childAspectRatio: 0.75),
+          delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return ProductCard(productId: "", productImageUrl: trendingProductItems[index][0], productTitle: trendingProductItems[index][1], discountPrice: trendingProductItems[index][2], actualPrice: trendingProductItems[index][3], rating: trendingProductItems[index][4], reviewsCount: trendingProductItems[index][5]);
+            },
+            childCount: trendingProductItems.length,
+          ),
+      ),
+    );
   }
 }
