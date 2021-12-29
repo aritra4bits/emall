@@ -70,11 +70,13 @@ class _DashboardViewState extends State<DashboardView> {
                 [
                   bannerAd(),
                   SizedBox(height: 30.h,),
-                  const HeadingText(title: 'TRENDING'),
                 ]
             ),
           ),
-          trendingProducts(),
+          // const SliverToBoxAdapter(
+          //   child: HeadingText(title: 'TRENDING'),
+          // ),
+          // trendingProducts(),
         ],
       ),
     );

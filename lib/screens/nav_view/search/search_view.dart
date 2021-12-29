@@ -4,8 +4,11 @@ import 'package:emall/managers/search_manager/search_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/models/product_model/product_model.dart';
 import 'package:emall/screens/nav_view/stores/views/store_details_view.dart';
+import 'package:emall/screens/product_details/product_details.dart';
 import 'package:emall/services/web_service_components/api_response.dart';
+import 'package:emall/utils/app_utils.dart';
 import 'package:emall/widgets/grey_button.dart';
+import 'package:emall/widgets/keyboard_dismiss_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -31,38 +34,59 @@ class _SearchViewState extends State<SearchView> {
   FocusNode focusNode = FocusNode();
 
   @override
+  void initState() {
+    super.initState();
+    searchManager.searchQuery.listen((searchQuery) {
+      if(searchQuery != null){
+        searchController.text = searchQuery;
+        focusNode.requestFocus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    searchController.clear();
+    productDetailsManager.resetData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
+    Size size = MediaQuery.of(context).size;
+    return KeyboardDismissWrapper(
+      child: Scaffold(
         backgroundColor: Colors.grey[100],
-        elevation: 0,
-        leading: Padding(
-          padding: EdgeInsets.all(8.sp),
-          child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
-        ),
-        titleSpacing: 0,
-        title: searchBar(context),
-      ),
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: 15.w),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                  [
-                    SizedBox(height: 20.h,),
-                    storeDetails(),
-                    SizedBox(height: 30.h,),
-                    // storeNameSection(title: 'SONY STORE'),
-                    // SizedBox(height: 40.h,),
-                  ]
-              ),
-            ),
+        appBar: AppBar(
+          backgroundColor: Colors.grey[100],
+          elevation: 0,
+          leading: Padding(
+            padding: EdgeInsets.all(8.sp),
+            child: GreyRoundButton(onPressed: (){navManager.updateNavIndex(0);}, icon: Icons.arrow_back_ios_rounded,),
           ),
-          productList(),
-          SliverToBoxAdapter(child: SizedBox(height: 20.h,)),
-        ],
+          titleSpacing: 0,
+          title: searchBar(context),
+        ),
+        body: CustomScrollView(
+          slivers: [
+            // SliverPadding(
+            //   padding: EdgeInsets.symmetric(horizontal: 15.w),
+            //   sliver: SliverList(
+            //     delegate: SliverChildListDelegate(
+            //         [
+            //           SizedBox(height: 20.h,),
+            //           suggestions(),
+            //           SizedBox(height: 30.h,),
+            //           storeNameSection(title: 'SONY STORE'),
+            //         ]
+            //     ),
+            //   ),
+            // ),
+            SliverToBoxAdapter(child: SizedBox(height: 20.h,)),
+            productList(size),
+            SliverToBoxAdapter(child: SizedBox(height: 20.h,)),
+          ],
+        ),
       ),
     );
   }
@@ -86,6 +110,9 @@ class _SearchViewState extends State<SearchView> {
               onSubmitted: (value){
                 if(value != '') {
                   searchManager.searchProduct(searchTerm: value);
+                } else {
+                  focusNode.requestFocus();
+                  AppUtils.showToast("Please enter product name to search");
                 }
               },
               onChanged: (value) {
@@ -102,14 +129,19 @@ class _SearchViewState extends State<SearchView> {
             ),
           ),
           IconButton(onPressed: (){
-            searchManager.searchProduct(searchTerm: searchController.text);
+            if(searchController.text.isNotEmpty){
+              searchManager.searchProduct(searchTerm: searchController.text);
+            } else {
+              focusNode.requestFocus();
+              AppUtils.showToast("Please enter product name to search");
+            }
           }, icon: Icon(Icons.search, color: const Color(0xFF727272), size: 22.sp,),)
         ],
       ),
     );
   }
 
-  Widget storeDetails() {
+  Widget suggestions() {
     return ListView.builder(
       itemCount: storeDetailsItems.length,
       shrinkWrap: true,
@@ -149,7 +181,7 @@ class _SearchViewState extends State<SearchView> {
     );
   }
 
-  Widget productList(){
+  Widget productList(Size size){
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       sliver: StreamBuilder<ApiResponse<ProductModel>?>(
@@ -167,7 +199,13 @@ class _SearchViewState extends State<SearchView> {
                   return const SliverToBoxAdapter(child: SizedBox());
               }
             }
-            return const SliverToBoxAdapter(child: SizedBox());
+            return SliverToBoxAdapter(child: SizedBox(
+              height: size.height - 200.h,
+              width: size.width,
+              child: const Center(
+                child: Text("Please enter product name to search"),
+              ),
+            ));
           }
       ),
     );
@@ -184,32 +222,37 @@ class _SearchViewState extends State<SearchView> {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return productCard(imageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${items[index].mediaGalleryEntries!.first.file!}", title: items[index].name!);
+            return productCard(productId: items[index].id!, imageUrl: "https://mage2.fireworksmedia.com/pub/media/catalog/product${items[index].mediaGalleryEntries!.first.file!}", title: items[index].name!);
           },
         childCount: items.length,
       ),
     );
   }
 
-  Widget productCard({required String imageUrl, required String title}){
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.sp),
-        color: Colors.white,
-      ),
-      margin: EdgeInsets.only(bottom: 10.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 5.h),
-            child: Image.network(imageUrl, width: 100.w, fit: BoxFit.fitWidth,),
-          ),
-          Flexible(child: Padding(
-            padding: EdgeInsets.only(left: 10.w, top: 20.h, bottom: 10.h, right: 10.w),
-            child: Text(title, style: TextStyle(color: const Color(0xFF373737), fontFamily: 'DinBold', fontSize: 15.sp),),
-          )),
-        ],
+  Widget productCard({required int productId, required String imageUrl, required String title}){
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetails(productId: productId.toString(),),));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.sp),
+          color: Colors.white,
+        ),
+        margin: EdgeInsets.only(bottom: 10.h),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 10.w, top: 5.h, bottom: 5.h),
+              child: Image.network(imageUrl, width: 100.w, height: 100.h, fit: BoxFit.contain,),
+            ),
+            Flexible(child: Padding(
+              padding: EdgeInsets.only(left: 10.w, top: 20.h, bottom: 10.h, right: 10.w),
+              child: Text(title, style: TextStyle(color: const Color(0xFF373737), fontFamily: 'DinBold', fontSize: 15.sp),),
+            )),
+          ],
+        ),
       ),
     );
   }

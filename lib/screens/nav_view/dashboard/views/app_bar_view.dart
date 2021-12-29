@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:emall/constants/colors.dart';
+import 'package:emall/managers/search_manager/search_manager.dart';
+import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
+import 'package:emall/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppBarView extends StatefulWidget {
-  final TextEditingController? searchController;
-  final FocusNode? focusNode;
-  const AppBarView({Key? key, this.searchController, this.focusNode}) : super(key: key);
+  const AppBarView({Key? key}) : super(key: key);
 
   @override
   State<AppBarView> createState() => _AppBarViewState();
@@ -17,6 +18,8 @@ class AppBarView extends StatefulWidget {
 class _AppBarViewState extends State<AppBarView> {
 
   static const methodChannel = MethodChannel('emall/data');
+  TextEditingController searchController = TextEditingController();
+  FocusNode focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -65,16 +68,14 @@ class _AppBarViewState extends State<AppBarView> {
         children: [
           Expanded(
             child: TextField(
-              controller: widget.searchController,
-              focusNode: widget.focusNode,
+              controller: searchController,
+              focusNode: focusNode,
               textInputAction: TextInputAction.search,
-              onSubmitted: (value){
-                if(value != '') {
-
-                }
-              },
-              onChanged: (value) {
-
+              style: const TextStyle(color: Colors.white),
+              onTap: () {
+                searchManager.setSearchQuery(searchController.text);
+                searchController.clear();
+                navManager.updateNavIndex(1);
               },
               decoration: InputDecoration(
                 isDense: true,
@@ -86,7 +87,11 @@ class _AppBarViewState extends State<AppBarView> {
               ),
             ),
           ),
-          IconButton(onPressed: (){}, icon: Icon(Icons.search, color: Colors.white, size: 26.sp,),)
+          IconButton(onPressed: (){
+            searchManager.setSearchQuery(searchController.text);
+            searchController.clear();
+            navManager.updateNavIndex(1);
+          }, icon: Icon(Icons.search, color: Colors.white, size: 26.sp,),)
         ],
       ),
     );

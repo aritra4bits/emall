@@ -11,6 +11,9 @@ class SearchManager{
   final _searchController = BehaviorSubject<ApiResponse<SearchModel>?>();
   Stream<ApiResponse<SearchModel>?> get searchData => _searchController.stream;
 
+  final _searchQueryController = BehaviorSubject<String?>();
+  Stream<String?> get searchQuery => _searchQueryController.stream;
+
   Future<void> searchProduct({required String searchTerm, bool withLoading = true}) async {
     if(withLoading) {
       _searchController.sink.add(ApiResponse.loading("In Progress"));
@@ -34,12 +37,19 @@ class SearchManager{
     }
   }
 
+  setSearchQuery(String query){
+    _searchQueryController.sink.add(query);
+  }
+
   dispose(){
     _searchController.close();
+    _searchQueryController.close();
   }
 
   resetData(){
+    print("search reset");
     _searchController.sink.add(null);
+    _searchQueryController.sink.add(null);
   }
 }
 

@@ -16,10 +16,7 @@ class KeyboardDismissWrapper extends StatelessWidget {
       onTapDown: (onTapDown) {
         unFocus(context);
       },
-      onVerticalDragStart: (onDragStart) {
-        unFocus(context);
-      },
-      onHorizontalDragStart: (onDragStart) {
+      onVerticalDragDown: (details) {
         unFocus(context);
       },
       child: child,

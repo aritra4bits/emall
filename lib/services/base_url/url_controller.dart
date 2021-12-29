@@ -7,6 +7,7 @@ class UrlController {
 
   String registerUrlEndpoint = "/rest/$storeCode/V1/customers";
   String loginUrlEndpoint = "/rest/$storeCode/V1/integration/customer/token";
+  String resetPasswordUrlEndpoint = "/rest/$storeCode/V1/customers/password";
   String userDetailsUrlEndpoint = "/rest/$storeCode/V1/customers/me";
   String searchUrlEndpoint = "/rest/$storeCode/V1/search";
   String productUrlEndpoint = "/rest/$storeCode/V1/products";
@@ -25,6 +26,10 @@ class UrlController {
 
   loginUserUrl() {
     return kBaseURL + loginUrlEndpoint;
+  }
+
+  resetPasswordUrl() {
+    return kBaseURL + resetPasswordUrlEndpoint;
   }
 
   userDetailsUrl() {

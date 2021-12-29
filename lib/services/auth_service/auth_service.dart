@@ -19,6 +19,12 @@ class AuthService {
     return response;
   }
 
+  static Future<dynamic> resetPassword(Map params) async {
+    var httpBody = json.encode(params);
+    dynamic response = await _helper.putRequest(UrlController().resetPasswordUrl(), httpBody);
+    return response;
+  }
+
   static Future<dynamic> getUserDetails() async {
     dynamic response = await _helper.getRequest(UrlController().userDetailsUrl());
     return response;

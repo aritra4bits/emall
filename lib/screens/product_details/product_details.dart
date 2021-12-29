@@ -41,16 +41,17 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
     ["hdtv.png", 'Samsung 32"TV', "599.80", "", 4.0, 214],
   ];
 
-  List recommendedProductItems = [
-    ["milk.png", "Dutch Lady Purefarm UHT Milk - LOW FAT...", "2.90", "", 5.0, 24],
-    ["router.png", "MILO ACTIV-GO 1Kg", "9.80", "19.80", 4.0, 214],
-    ["ps4.png", "Sony PlayStation 4 Mega Pack 2", "1099.90", "", 5.0, 24],
-    ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214],
-    ["milk.png", "Dutch Lady Purefarm UHT Milk - LOW FAT...", "2.90", "", 5.0, 24],
-    ["router.png", "MILO ACTIV-GO 1Kg", "9.80", "19.80", 4.0, 214],
-    ["ps4.png", "Sony PlayStation 4 Mega Pack 2", "1099.90", "", 5.0, 24],
-    ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214],
-  ];
+  List recommendedProductItems = [];
+  // [
+  //   ["milk.png", "Dutch Lady Purefarm UHT Milk - LOW FAT...", "2.90", "", 5.0, 24],
+  //   ["router.png", "MILO ACTIV-GO 1Kg", "9.80", "19.80", 4.0, 214],
+  //   ["ps4.png", "Sony PlayStation 4 Mega Pack 2", "1099.90", "", 5.0, 24],
+  //   ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214],
+  //   ["milk.png", "Dutch Lady Purefarm UHT Milk - LOW FAT...", "2.90", "", 5.0, 24],
+  //   ["router.png", "MILO ACTIV-GO 1Kg", "9.80", "19.80", 4.0, 214],
+  //   ["ps4.png", "Sony PlayStation 4 Mega Pack 2", "1099.90", "", 5.0, 24],
+  //   ["router.png", "TP-LINK 5Ghz + 2.4GHz AC600 Mini...", "199.80", "799.80", 4.0, 214],
+  // ];
 
   bool isLoading = false;
 
@@ -60,6 +61,12 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
     _tabController = TabController(length: 2, vsync: this);
     productDetailsManager.getProducts(productId: widget.productId);
     productsListingManager.getOnSaleProducts();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    productDetailsManager.resetData();
   }
 
   @override
@@ -160,9 +167,10 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
                     // SizedBox(height: 10.h,),
                     reviewsCard(reviewCount: 1245, ratings: 5.0, onViewAll: (){}),
                     SizedBox(height: 10.h,),
-                    storeNameSection(title: 'SONY STORE'),
-                    SizedBox(height: 10.h,),
+                    // storeNameSection(title: 'SONY STORE'),
+                    // SizedBox(height: 10.h,),
                     storeTabView(context),
+                    SizedBox(height: 150.h,),
                   ],
                 );
               }
@@ -380,7 +388,8 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
 
   Widget storeTabView(BuildContext context) {
     return SizedBox(
-      height: (recommendedProductItems.length/2).ceilToDouble() * 280,
+      // height: (recommendedProductItems.length/2).ceilToDouble() * 280,
+      height: MediaQuery.of(context).size.height/1.5,
       child: Column(
         children: <Widget>[
           TabBar(
@@ -413,7 +422,8 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   }
 
   Widget recommendedProducts() {
-    return GridView.builder(
+    if(recommendedProductItems.isNotEmpty) {
+      return GridView.builder(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 200,
@@ -426,6 +436,11 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
         itemBuilder: (BuildContext ctx, index) {
           return ProductCard(productId: "", productImageUrl: recommendedProductItems[index][0], productTitle: recommendedProductItems[index][1], discountPrice: recommendedProductItems[index][2], actualPrice: recommendedProductItems[index][3], rating: recommendedProductItems[index][4], reviewsCount: recommendedProductItems[index][5]);
         });
+    } else {
+      return const Center(
+        child: Text("No products found"),
+      );
+    }
   }
 
   Widget onSaleProducts(){
@@ -468,21 +483,21 @@ class _ProductDetailsState extends State<ProductDetails> with TickerProviderStat
   Widget addToCartButton(Item product) {
     return Row(
       children: [
-        Material(
-          color: Colors.white,
-          child: Container(
-            alignment: Alignment.center,
-            height: 60.h,
-            width: 80.w,
-            child: IconButton(
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const StoreDetailsView(),));
-              },
-              padding: EdgeInsets.zero,
-              icon: Image.asset('assets/images/icons/stores.png', color: Colors.black, height: 30, fit: BoxFit.fitHeight,),
-            ),
-          ),
-        ),
+        // Material(
+        //   color: Colors.white,
+        //   child: Container(
+        //     alignment: Alignment.center,
+        //     height: 60.h,
+        //     width: 80.w,
+        //     child: IconButton(
+        //       onPressed: (){
+        //         Navigator.push(context, MaterialPageRoute(builder: (context) => const StoreDetailsView(),));
+        //       },
+        //       padding: EdgeInsets.zero,
+        //       icon: Image.asset('assets/images/icons/stores.png', color: Colors.black, height: 30, fit: BoxFit.fitHeight,),
+        //     ),
+        //   ),
+        // ),
         Expanded(
           child: SizedBox(
             height: 60.h,

@@ -20,8 +20,16 @@ class _LoginUserViewState extends State<LoginUserView> {
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  FocusNode emailFocusNode = FocusNode();
 
   bool isLoading = false;
+
+  unFocus(BuildContext context){
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +54,7 @@ class _LoginUserViewState extends State<LoginUserView> {
               SizedBox(height: 40.sp,),
               TextFieldWidget(
                 controller: emailController,
+                focusNode: emailFocusNode,
                 hintText: "Enter email address",
                 textInputType: TextInputType.emailAddress,
               ),
@@ -54,6 +63,39 @@ class _LoginUserViewState extends State<LoginUserView> {
                 hintText: "Enter password",
                 obscureText: true,
                 textInputType: TextInputType.visiblePassword,
+              ),
+              SizedBox(height: 10.h,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () async {
+                      if(emailController.text.isNotEmpty){
+                        unFocus(context);
+                        Map params = {
+                          "email": emailController.text,
+                          "template": "email_reset"
+                        };
+                        setState(() {
+                          isLoading = true;
+                        });
+                        bool? response = await authManager.resetPassword(params: params);
+                        setState(() {
+                          isLoading = false;
+                        });
+                        if(response == true){
+                          AppUtils.showToast("Password reset link send to your email address");
+                        } else {
+                          AppUtils.showToast("Failed to send password reset link to this email address");
+                        }
+                      } else {
+                        AppUtils.showToast("Please enter a valid email address");
+                        emailFocusNode.requestFocus();
+                      }
+                    },
+                    child: Text("Forgot password?", style: TextStyle(color: Colors.white, fontSize: 16.sp),),
+                  )
+                ],
               ),
               SizedBox(height: 40.sp,),
               SizedBox(

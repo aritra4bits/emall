@@ -59,6 +59,23 @@ class AuthManager{
     }
   }
 
+  Future<bool?> resetPassword({required Map params}) async {
+    var result;
+    try{
+      result = await AuthService.resetPassword(params);
+    }catch(e){
+      AppUtils.showToast('Error: $e');
+      return false;
+    }
+    if (result != null && result is bool){
+      print(result);
+      return result;
+    } else {
+      AppUtils.showToast('Failed to send reset password link');
+      return false;
+    }
+  }
+
   Future<void> getUser({bool withLoading = true}) async {
     if(withLoading) {
       _customerDetailsController.sink.add(ApiResponse.loading("In Progress"));

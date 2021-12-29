@@ -1,5 +1,6 @@
 import 'package:emall/constants/colors.dart';
 import 'package:emall/managers/category_manager/category_manager.dart';
+import 'package:emall/managers/search_manager/search_manager.dart';
 import 'package:emall/managers/ui_manager/nav_bar_manager.dart';
 import 'package:emall/models/product_categories/product_category_models.dart';
 import 'package:emall/screens/nav_view/stores/widgets/store_banner_card.dart';
@@ -44,10 +45,10 @@ class _StoreViewState extends State<StoreView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             searchBar(context),
-            bannerList(),
+            // bannerList(),
             Padding(
-              padding: EdgeInsets.only(left: 20.w, top: 30.h),
-              child: Text('CATEGORY', style: TextStyle(fontSize: 22.sp, color: const Color(0xFF373737), fontFamily: 'DinBold'),),
+              padding: EdgeInsets.only(left: 20.w, top: 10.h),
+              child: Text('CATEGORIES', style: TextStyle(fontSize: 22.sp, color: const Color(0xFF373737), fontFamily: 'DinBold'),),
             ),
             categoryList(),
           ],
@@ -72,13 +73,10 @@ class _StoreViewState extends State<StoreView> {
               controller: searchController,
               focusNode: focusNode,
               textInputAction: TextInputAction.search,
-              onSubmitted: (value){
-                if(value != '') {
-
-                }
-              },
-              onChanged: (value) {
-
+              onTap: () {
+                searchManager.setSearchQuery(searchController.text);
+                searchController.clear();
+                navManager.updateNavIndex(1);
               },
               decoration: InputDecoration(
                 isDense: true,
@@ -90,7 +88,11 @@ class _StoreViewState extends State<StoreView> {
               ),
             ),
           ),
-          IconButton(onPressed: (){}, icon: Icon(Icons.search, color: Colors.white, size: 26.sp,),)
+          IconButton(onPressed: (){
+            searchManager.setSearchQuery(searchController.text);
+            searchController.clear();
+            navManager.updateNavIndex(1);
+          }, icon: Icon(Icons.search, color: Colors.white, size: 26.sp,),)
         ],
       ),
     );
@@ -136,9 +138,9 @@ class _StoreViewState extends State<StoreView> {
               case Status.COMPLETED:
                 return categoryListView(snapshot.data?.data?.childrenData??[]);
               case Status.NODATAFOUND:
-                return SizedBox();
+                return const SizedBox();
               case Status.ERROR:
-                return SizedBox();
+                return const SizedBox();
             }
           }
           return Container();

@@ -117,7 +117,7 @@ class _NavBarViewState extends State<NavBarView> {
             ),
           ),
           BottomNavigationBarItem(
-            label: "Stores",
+            label: "Categories",
             icon: Padding(
               padding: EdgeInsets.symmetric(vertical: 5.h),
               child: Image.asset('assets/images/icons/stores.png', height: 24.sp, color: _tabIndex == 2 ? Colors.white : Colors.white,),
